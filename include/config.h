@@ -23,6 +23,7 @@
 #include "spotLight.h"
 #include "mesh.h"
 #include "model.h"
+#include "scene.h"
 
 using namespace std;
 

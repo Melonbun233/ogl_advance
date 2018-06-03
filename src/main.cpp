@@ -9,7 +9,7 @@ using namespace glm;
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
-const string window_name = "This is Light";
+const string window_name = "Advanced OpenGL";
 
 float delta_time = 0.0;
 float current_frame = 0.0;
@@ -25,7 +25,7 @@ GLboolean MOUSE_FIRST = true;
 GLboolean MOUSE_VERTICAL_INVERSE = true;
 GLboolean MOUSE_HORIZONTAL_INVERSE = false;
 
-int main(){
+int main(int argc, char *argv[]){
 	GLFWwindow *window = init(SCR_WIDTH, SCR_HEIGHT, window_name);
 	if(window == NULL)
 		return -1;
@@ -36,19 +36,19 @@ int main(){
 		camera.setMouseHorizontalInverse(true);
 
 	//configure paths
-	const string vshader_path = "../resources/shader/vshader.vs";
-	const string fshader_path = "../resources/shader/light.fs";
-	const string nano_path = "../resources/objects/aventador/Avent.obj";
+	const string curr_dir = string(argv[0]).substr(0, string(argv[0]).find_last_of('/'));
+	const string vshader_path = curr_dir + "/../resources/shader/vshader.vs";
+	const string fshader_path = curr_dir + "/../resources/shader/light.fs";
+	const string nano_path = curr_dir + "/../resources/objects/nanosuit/nanosuit.obj";
 	//slime/DirtSlime.fbx";
 
 	Shader nano_shader(vshader_path, fshader_path);
-	Shader slime_shader(vshader_path, fshader_path);
 	//--------------------------models---------------------------------------//
-	Model nano(nano_path);
+	Model nano(nano_path, nano_shader);
 
 	mat4 nano_model;
-	nano_model = translate(nano_model, vec3(0.0f));
-	nano_model = scale(nano_model, vec3(1.0));
+	nano_model = translate(nano_model, vec3(0.0f, -1.75f, 0.0f));
+	nano_model = scale(nano_model, vec3(0.3));
 
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
@@ -89,17 +89,15 @@ int main(){
 			0.1f, 100.0f);
 
 		//light
-		sendDirLights(dirLights, dirLightsNum, nano_shader);
-		sendDirLights(dirLights, dirLightsNum, slime_shader);
+		sendDirLights(dirLights, dirLightsNum, nano.shader);
 
-		nano_shader.use();
-		nano_shader.setMat4("view", view);
-		nano_shader.setMat4("proj", proj);
-		nano_shader.setMat4("model",nano_model);
-		nano_shader.setVec3("viewPos", camera.Position);
+		nano.shader.setMat4("view", view);
+		nano.shader.setMat4("proj", proj);
+		nano.shader.setMat4("model",nano_model);
+		nano.shader.setVec3("viewPos", camera.Position);
 
 		//draw objects
-		nano.render(nano_shader);
+		nano.render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

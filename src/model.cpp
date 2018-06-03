@@ -4,7 +4,7 @@ using namespace std;
 using namespace Assimp;
 using namespace glm;
 
-void Model::render(Shader shader)
+void Model::render()
 {
 	shader.use();
 	for (unsigned int i = 0; i < meshes.size(); i++)

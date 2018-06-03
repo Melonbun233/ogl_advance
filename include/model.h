@@ -20,16 +20,24 @@ class Model
 {
 public:
 	//constructor provided with a path indicatin where the model is
-	Model(const std::string &path) {loadModel(path);}
+	Model(const std::string &path, Shader &shader) : shader(shader)
+	{
+		loadModel(path);
+	}
+
 	//call this function to render the model with provided shader
-	void render(Shader shader);
-	//model data
-	std::vector<Mesh> meshes;
-	//store loaded textures to optimize
-	std::vector<Texture> textures_loaded; 
+	void render();
+
+	//directory of this model. All other textures should be in the same directory
 	std::string directory;
+	//shader used for this model
+	Shader shader;
 
 private:
+	//store loaded textures to optimize
+	std::vector<Texture> textures_loaded; 
+	//model data
+	std::vector<Mesh> meshes;
 	//load the model using assimp
 	void loadModel(const std::string path);
 	//recursively process each node and it's children
