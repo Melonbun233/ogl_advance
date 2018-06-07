@@ -18,23 +18,23 @@ public:
 
 	//default constructor
 	//default color: white, ambient: 0.2, diffuse: 0.8, specular:1.0
-	PointLight(glm::vec3 pos, float dis) : Light(glm::vec3(0), pos)
+	PointLight(glm::vec3 position, float distance) : Light(glm::vec3(0), position)
 		{
-			setAttenuation(dis);
+			setAttenuation(distance);
 		}
 
 	//complete constructor
-	PointLight(glm::vec3 col, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float dis) :
-		Light(col, glm::vec3(0), pos, amb, diff, spec)
+	PointLight(glm::vec3 color, glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse,
+		glm::vec3 specular, float distance) : Light(col, glm::vec3(0), position, ambient, diffuse, specular)
 		{
-			setAttenuation(dis);
+			setAttenuation(distance);
 		}
 
 	//send all vectors to a specific shader with light's name
 	void sendShader(Shader &shader, const std::string &name) const override;
 	//set all coefficients from range
 	//you should call this function if you have changed range of this light
-	void setAttenuation(float dis);
+	void setAttenuation(float distance);
 
 private:
 	float constant;	//constant coefficient of attenuation	
