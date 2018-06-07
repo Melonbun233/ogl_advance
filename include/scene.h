@@ -25,7 +25,9 @@ struct SceneID {
 	const unsigned int id;
 	OBJECT_TYPE type;
 }
+
 //NOTE: every object in this scene has its own unique id
+
 class Scene
 {
 public:
@@ -83,12 +85,24 @@ public:
 		glm::vec3 diffuse, glm::vec3 specular, float distance);
 
 
-	//remove a light according to its id
+	//remove a light given to its id
 	//PRE:
 	//	ID: returned id when adding the light into the scene
 	//POST:
-	//	removing invalid id will not result in anything
-	void removeLight(SceneID ID);
+	//	removing invalid id will result in nothing
+	void removeSpotLight(SceneID ID);
+	void removePointLight(SceneID ID);
+	void removeDirLight(SceneID ID);
+
+	//get a light given its id
+	//PRE:
+	// ID: returned id when adding the light into the scene
+	//POST:
+	// 	return a pointer points to the light
+	//	if the id is invalid, NULL will be returned
+	SpotLight*  getSpotLight(SceneID ID);
+	DirLight*   getDirLight(SceneID ID);
+	PointLight* getPointLight(SceneID ID);
 
 
 

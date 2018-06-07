@@ -3,8 +3,9 @@
 using namespace glm;
 using namespace std;
 
-SceneID Scene::addModel(Model model)
+SceneID Scene::addModel(const string path)
 {
+	Model model(path);
 	unsigned int id = count ++;
 	models.insert({id, model});
 	return SceneID(id, MODEL);
@@ -60,25 +61,66 @@ SceneID Scene::addPointLight(vec3 color, vec3 position, vec3 ambient, vec3 diffu
 	return SceneID(id, POINT_LIGHT);
 }
 
-void Scene::removeLight(SceneID ID)
+void Scene::removeSpotLight(SceneID ID)
 {
-	if (SceneID.type == SPOT_LIGHT)
+	if (ID.type == SPOT_LIGHT)
 	{
 		auto search = spotLights.find(ID.id);
 		if (search != spotLights.end())
 			spotLights.erase(search);
 	} 
-	else if (SceneID.type == DIR_LIGHT)
+}
+
+void Scene::removeDirLight(SceneID ID)
+{
+	if (ID.type == DIR_LIGHT)
 	{
 		auto search = dirLights.find(ID.id);
 		if (search != dirLights.end())
 			dirLights.erase(search);
 	}
-	else if (SceneID.type == POINT_LIGHT)
+}
+
+void Scene::removePointLight(SceneID ID)
+{
+	if (ID.type == POINT_LIGHT)
 	{
 		auto search = pointLights.find(ID.id);
 		if (search != pointLights.end())
 			pointLights.erase(search);
 	}
+}
+
+SpotLight* getSpotLight(SceneID ID)
+{
+	if (ID.type == SPOT_LIGHT)
+	{
+		auto search = spotLights.find(ID.id);
+		if (search != spotLights.end())
+			return &search->second;
+	}
+	return NULL;
+}
+
+DirLight* getDirLight(Scene ID)
+{
+	if(ID.type == DIR_LIGHT)
+	{
+		auto search = dirLights.find(ID.id);
+		if (search != dirLights.end())
+			return &search->second;
+	}
+	return NULL;
+}
+
+PointLight* getPointLight(Scene ID)
+{
+	if(ID.type == POINT_LIGHT)
+	{
+		auto search = pointLights.find(ID.id);
+		if(search != pointLights.end())
+			return &search->second;
+	}
+	return NULL;
 }
 
