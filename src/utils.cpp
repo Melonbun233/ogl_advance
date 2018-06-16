@@ -2,7 +2,7 @@
 using namespace std;
 //this file contains all math and other utility functions
 
-GLFWwindow* init(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT, const string name){
+GLFWwindow* initWindow(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT, const string name){
 	//initiate glfw and window
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -36,31 +36,4 @@ GLFWwindow* init(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT, const string n
 
 	glEnable(GL_DEPTH_TEST);
 	return window;
-}
-
-void sendPointLights(PointLight lights[], int light_num, Shader &shader)
-{
-	shader.use();
-	shader.setInt("POINT_LIGHTS_NUM", light_num);
-	for (int i = 0; i < light_num; i ++){
-		lights[i].sendShader(shader, "pointLights[" + to_string(i) + "]");
-	}
-}
-
-void sendDirLights(DirLight lights[], int light_num, Shader &shader)
-{
-	shader.use();
-	shader.setInt("DIR_LIGHTS_NUM", light_num);
-	for (int i = 0; i < light_num; i ++){
-		lights[i].sendShader(shader, "dirLights[" + to_string(i) + "]");
-	}
-}
-
-void sendSpotLights(SpotLight lights[], int light_num, Shader &shader)
-{
-	shader.use();
-	shader.setInt("SPOT_LIGHTS_NUM", light_num);
-	for (int i = 0; i < light_num; i ++){
-		lights[i].sendShader(shader, "spotLights[" + to_string(i) + "]");
-	}
 }

@@ -25,7 +25,8 @@ public:
 
 	//complete constructor
 	PointLight(glm::vec3 color, glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse,
-		glm::vec3 specular, float distance) : Light(col, glm::vec3(0), position, ambient, diffuse, specular)
+		glm::vec3 specular, float distance) : Light(color, glm::vec3(0), position, 
+		ambient, diffuse, specular)
 		{
 			setAttenuation(distance);
 		}

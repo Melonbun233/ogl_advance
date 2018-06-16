@@ -144,8 +144,8 @@ vec3 processSpotLights(vec3 normal, vec3 viewDir)
 
 vec3 calcAmbient(vec3 light_amb)
 {
-	vec3 tex = vec3(0, 0, 0);
-	if (material.amb_num == 0)	//no ambient map, use material's own ambient
+	vec3 tex; 
+	if (material.amb_num == 0)	//no ambient map, use material's own ambient color
 		tex = material.ambient;
 	else
 	{
@@ -158,10 +158,10 @@ vec3 calcAmbient(vec3 light_amb)
 
 vec3 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir)
 {
-	vec3 tex = vec3(0, 0, 0);
+	vec3 tex;
 	float diff = max(dot(normal, lightDir), 0.0);
 
-	if (material.diff_num == 0) //no diffuse map, use material's own diffuse
+	if (material.diff_num == 0) //no diffuse map, use material's own diffuse color
 		tex = material.diffuse;
 	else 
 	{
@@ -173,11 +173,11 @@ vec3 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir)
 
 vec3 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir)
 {
-	vec3 tex = vec3(0, 0, 0);
+	vec3 tex;
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
-	if (material.spec_num == 0) //no specular map, use material's own specular
+	if (material.spec_num == 0) //no specular map, use material's own specular color
 		tex = material.specular;
 	else 
 	{

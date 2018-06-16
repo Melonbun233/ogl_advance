@@ -7,12 +7,14 @@
 #include <unordered_map>
 
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "shader.h"
 #include "model.h"
 #include "light.h"
 #include "spotLight.h"
 #include "dirLight.h"
 #include "pointLight.h"
+#include "camera.h"
 
 enum OBJECT_TYPE {
 	MODEL,
@@ -24,7 +26,9 @@ enum OBJECT_TYPE {
 struct SceneID {
 	const unsigned int id;
 	OBJECT_TYPE type;
-}
+
+	SceneID(unsigned int id, OBJECT_TYPE type) : id(id), type(type){}
+};
 
 /*
 	NOTE: every object in this scene has its own unique id
@@ -41,7 +45,7 @@ public:
 	Scene(glm::vec3 cam_pos, unsigned int width, unsigned int height) 
 	{
 		camera = Camera(cam_pos); 
-		perspective = 1;
+		perspec = 1;
 		scrWidth = width;
 		scrHeight = height;
 	}
@@ -61,11 +65,6 @@ public:
 /*	---------------------------------------------------------------------------------------
 	Adder Functions
 	---------------------------------------------------------------------------------------	*/
-
-	//set a new camera
-	//NOTE: every scene may have only one camera
-	void setCamera(Camera camera) {this->camera = camera;}
-
 	//add a model into the scene
 	//PRE: 
 	//	model: model added to the scene
@@ -162,7 +161,7 @@ public:
 private:
 	unsigned int scrWidth;
 	unsigned int scrHeight;
-	unsigned int perspective; //whether the scene is perspective
+	unsigned int perspec; //whether the scene is perspective
 	unsigned int count; //this is used for every object's id in the scene
 	Camera camera;
 	std::unordered_map<unsigned int, Model> models;
