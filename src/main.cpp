@@ -19,7 +19,6 @@ const extern float cube_vertices[];
 const extern vec3 cube_pos[];
 
 //setting up camera
-Camera camera = Camera(vec3(0, 0, 6));
 float MOUSE_X, MOUSE_Y;
 GLboolean MOUSE_FIRST = true;
 GLboolean MOUSE_VERTICAL_INVERSE = true;
@@ -42,13 +41,9 @@ int main(int argc, char *argv[]){
 	const string nano_path = curr_dir + "/../resources/objects/nanosuit/nanosuit.obj";
 	//slime/DirtSlime.fbx";
 
-	Shader nano_shader(vshader_path, fshader_path);
-	//--------------------------models---------------------------------------//
-	Model nano(nano_path, nano_shader);
-
-	mat4 nano_model;
-	nano_model = translate(nano_model, vec3(0.0f, -1.75f, 0.0f));
-	nano_model = scale(nano_model, vec3(0.3));
+	//init and config scene, set the camera at (0, 0, 6)
+	Scene scene(vec3(0, 0, 6), SCR_WIDTH, SCR_HEIGHT);
+	SceneID model_id = scene.addModel(nano_path, vshader_path, fshader_path);
 
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
@@ -70,6 +65,9 @@ int main(int argc, char *argv[]){
 		SpotLight(vec3(-3.0, -2.0, -1.0), vec3(3.0, 2.0, -1.0), 20.0, 23.0)
 	};
 	spotLights[0].color = vec3(0.0, 1.0, 0.0);
+
+	scene.addDirLight(dirLights[0]);
+	scene.addDirLight(dirLights[1]);
 	//-----------------------resndering loop---------------------------------//
 	while (!glfwWindowShouldClose(window)){
 		processInput(window);
@@ -82,22 +80,13 @@ int main(int argc, char *argv[]){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//update model, view, projection
-		//drawing main object
-		mat4 view, proj;
-		view = camera.getView();
-		proj = perspective(radians(camera.getFOV()), float(SCR_WIDTH/SCR_HEIGHT), 
-			0.1f, 100.0f);
-
-		//light
-		sendDirLights(dirLights, dirLightsNum, nano.shader);
-
-		nano.shader.setMat4("view", view);
-		nano.shader.setMat4("proj", proj);
-		nano.shader.setMat4("model",nano_model);
-		nano.shader.setVec3("viewPos", camera.Position);
+		mat4 nano_model;
+		nano_model = translate(nano_model, vec3(0.0f, -1.75f, 0.0f));
+		nano_model = scale(nano_model, vec3(0.3));
+		scene.setPosition(model_id, model);
 
 		//draw objects
-		nano.render();
+		scene.render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -26,22 +26,56 @@ struct SceneID {
 	OBJECT_TYPE type;
 }
 
-//NOTE: every object in this scene has its own unique id
+/*
+	NOTE: every object in this scene has its own unique id
+	NOTE: if you want to explicitly control all objects, call getter functions to get its pointer.
+		you can keep this pointer because this pointer will not change even if the hash map used to 
+		store the objects rehashed.
+	NOTE: every scene may have only one camera
+*/
 
 class Scene
 {
 public:
-	//default constructor
 	//only set the camera
-	Scene(Camera camera) : camera(camera), ID(0) {}
+	Scene(glm::vec3 cam_pos, unsigned int width, unsigned int height) 
+	{
+		camera = Camera(cam_pos); 
+		perspective = 1;
+		scrWidth = width;
+		scrHeight = height;
+	}
+
+	//set object's model view.
+	//this function will also set shaders' projection and view matrices
+	//you can call setPerspec to set the projection of the scene
+	//PRE: 
+	//	model_id: scene id of the model need to be positioned. this should be valid, otherwise
+	//		nothing will be done
+	//	model: model matrix used to set the position and scale of the object
+	void setPosition(SceneID model_id, glm::mat4 model);
+
+	//render all models and lights in the scene
+	void render();
+
+/*	---------------------------------------------------------------------------------------
+	Adder Functions
+	---------------------------------------------------------------------------------------	*/
+
+	//set a new camera
+	//NOTE: every scene may have only one camera
+	void setCamera(Camera camera) {this->camera = camera;}
 
 	//add a model into the scene
 	//PRE: 
 	//	model: model added to the scene
+	//	vshader_path: vertex shader path
+	//	fshader_path: fragment shader path
 	//POST:
 	//	return an unique ID presenting this model
 	//	this ID should be kept in order to delete or edit the model
-	SceneID addModel(const std::string path);
+	SceneID addModel(const std::string path, const std::string vshader_path, 
+		const std::string fshader_path);
 
 	//add a spot light into the scene
 	//PRE: 
@@ -58,6 +92,9 @@ public:
 	SceneID addSpotLight(glm::vec3 color, glm::vec3 direction, glm::vec3 position, glm::vec3 ambient,
 		glm::vec3 diffuse, glm::vec3 specular, float inner, float outer);
 
+	//passing a existed light, note change the light explicitly will change the light in the scene
+	SceneID addSpotLight(SpotLight &light);
+
 	//add a directional light in to the scene
 	//PRE:
 	//	direction: direction of the light
@@ -69,6 +106,9 @@ public:
 	//this is a more complete directional light adding function
 	SceneID addDirLight(glm::vec3 color, glm::vec3 direction, glm::vec3 ambient, 
 		glm::vec3 diffuse, glm::vec3 specular);
+
+	//passing a existing light, note change the light explicitly will change the light in the scene
+	SceneID addDirLight(DirLight &light);
 
 
 	//add a point light into the scene 
@@ -84,8 +124,14 @@ public:
 	SceneID addPointLight(glm::vec3 color, glm::vec3 position, glm::vec3 ambient, 
 		glm::vec3 diffuse, glm::vec3 specular, float distance);
 
+	//passing a existing light, note change the light explicitly will change the light in the scene
+	SceneID addPointLight(PointLight &light);
 
-	//remove a light given to its id
+/*	---------------------------------------------------------------------------------------
+	Remover Functions
+	---------------------------------------------------------------------------------------	*/
+
+	//remove an object given to its id
 	//PRE:
 	//	ID: returned id when adding the light into the scene
 	//POST:
@@ -93,6 +139,11 @@ public:
 	void removeSpotLight(SceneID ID);
 	void removePointLight(SceneID ID);
 	void removeDirLight(SceneID ID);
+	void removeModel(SceneID ID);
+
+/*	---------------------------------------------------------------------------------------
+	Getter Functions
+	---------------------------------------------------------------------------------------	*/
 
 	//get a light given its id
 	//PRE:
@@ -103,16 +154,32 @@ public:
 	SpotLight*  getSpotLight(SceneID ID);
 	DirLight*   getDirLight(SceneID ID);
 	PointLight* getPointLight(SceneID ID);
+	Model* 		getModel(SceneID ID);
+	Camera*		getCamera();
 
 
 
 private:
-	unsigned int count; //this is used for every objects in the scene
+	unsigned int scrWidth;
+	unsigned int scrHeight;
+	unsigned int perspective; //whether the scene is perspective
+	unsigned int count; //this is used for every object's id in the scene
 	Camera camera;
 	std::unordered_map<unsigned int, Model> models;
 	std::unordered_map<unsigned int, SpotLight> spotLights;
 	std::unordered_map<unsigned int, DirLight> dirLights;
 	std::unordered_map<unsigned int, PointLight> pointLights;
+
+	//helper functions to send lights to shaders
+	void sendPointLights(Shader &shader);
+	void sendDirLights(Shader &shader);
+	void sendSpotLights(Shader &shader);
+	//set model's shader with position matrices
+	//this function may be changed due to different shaders
+	void setShader(Shader &shader, glm::mat4 model, glm::mat4 view, glm::mat4 proj);
+	//send all lights in the scene to models' shaders
+	//This function should be called in order to enable new added or edited lights
+	void sendLights();
 
 };
 
