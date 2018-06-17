@@ -34,6 +34,7 @@ GLFWwindow* initWindow(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT, const st
 	}
 
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_ALWAYS);
 	return window;
 }
 
