@@ -182,7 +182,7 @@ vec3 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir)
 	else 
 	{
 		for (int i = 0; i < material.spec_num; i ++)
-			tex = vec3(texture(material.tex_specular[i], TexCoords));
+			tex += vec3(texture(material.tex_specular[i], TexCoords));
 	}
 
 	return light_spec * spec * tex;

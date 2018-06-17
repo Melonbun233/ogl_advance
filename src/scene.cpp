@@ -3,7 +3,7 @@
 using namespace glm;
 using namespace std;
 
-void Scene::setPosition(SceneID id, mat4 pos)
+void Scene::setModelPos(SceneID id, mat4 pos)
 {
 	if(id.type == MODEL)
 	{
@@ -15,73 +15,57 @@ void Scene::setPosition(SceneID id, mat4 pos)
 			mat4 view, proj;
 			view = camera.getView();
 			if (perspec)
-				proj = perspective(radians(camera.getFOV()), float(scrWidth)/float(scrHeight), 0.1f, 100.0f);
+				proj = perspective(radians(camera.getFOV()), float(scrWidth)/float(scrHeight),
+					0.1f, 100.0f);
 			else
 				proj = ortho(0.0f, float(scrWidth), 0.0f, float(scrHeight), 0.1f, 100.0f);
 			//set model's shader
-			setShader(model.shader, pos, view, proj);
+			setShader(model, pos, view, proj);
 		}
 	}
 }
 
-void Scene::setShader(Shader &shader, mat4 model, mat4 view, mat4 proj)
+void Scene::setShader(Model &obj, mat4 model, mat4 view, mat4 proj)
 {
-	shader.use();
-	shader.setMat4("view", view);
-	shader.setMat4("proj", proj);
-	shader.setMat4("model", model);
-	shader.setVec3("viewPos", camera.Position);
+	obj.shader.use();
+	obj.shader.setMat4("view", view);
+	obj.shader.setMat4("proj", proj);
+	obj.shader.setMat4("model", model);
+	obj.shader.setVec3("viewPos", camera.Position);
 }
 
 void Scene::render()
 {
-	sendLights();
 	for (auto it = models.begin(); it != models.end(); it++)
 	{
+		sendLights(it->second);
 		it->second.render();
 	}
 }
 
-void Scene::sendLights()
-{
-	for(auto it = models.begin(); it != models.end(); it++) //iterating through all models
-	{
-		sendPointLights(it->second.shader);
-		sendDirLights(it->second.shader);
-		sendSpotLights(it->second.shader);
-	}
-}
-
-void Scene::sendPointLights(Shader &shader)
+void Scene::sendLights(Model &model)
 {
 	int i;
-	shader.use();
-	shader.setInt("POINT_LIGHTS_NUM", pointLights.size());
+	model.shader.use();
+	model.shader.setInt("POINT_LIGHTS_NUM", pointLights.size());
+	model.shader.setInt("DIR_LIGHTS_NUM", dirLights.size());
+	model.shader.setInt("SPOT_LIGHTS_NUM", spotLights.size());
+
 	for(auto it = pointLights.begin(); it != pointLights.end(); it++)
 	{
-		it->second.sendShader(shader, "pointLights[" + to_string(i++) + "]");
+		it->second.sendShader(model.shader, "pointLights[" + to_string(i++) + "]");
 	}
-}
 
-void Scene::sendDirLights(Shader &shader)
-{
-	int i;
-	shader.use();
-	shader.setInt("DIR_LIGHTS_NUM", dirLights.size());
+	i = 0;
 	for(auto it = dirLights.begin(); it != dirLights.end(); it++)
 	{
-		it->second.sendShader(shader, "dirLights[" + to_string(i++) + "]");
+		it->second.sendShader(model.shader, "dirLights[" + to_string(i++) + "]");
 	}
-}
 
-void Scene::sendSpotLights(Shader &shader)
-{
-	int i;
-	shader.use();
-	shader.setInt("SPOT_LIGHTS_NUM", spotLights.size());
+	i = 0;
 	for(auto it = spotLights.begin(); it != spotLights.end(); it++)
 	{
-		it->second.sendShader(shader, "spotLights[" + to_string(i++) + "]");
+		it->second.sendShader(model.shader, "spotLights[" + to_string(i++) + "]");
 	}
 }
 

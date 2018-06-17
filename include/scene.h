@@ -57,7 +57,14 @@ public:
 	//	model_id: scene id of the model need to be positioned. this should be valid, otherwise
 	//		nothing will be done
 	//	model: model matrix used to set the position and scale of the object
-	void setPosition(SceneID model_id, glm::mat4 model);
+	void setModelPos(SceneID model_id, glm::mat4 model);
+
+	//set the projection as perspective or ortho
+	//those two functions are not available currently
+	//void setPerspective() {perspec = true;}
+	//void setOrtho() {perspec = false;}
+	//check whether the current view is perspective
+	bool isPerspective() {return perspec;}
 
 	//render all models and lights in the scene
 	void render();
@@ -161,7 +168,7 @@ public:
 private:
 	unsigned int scrWidth;
 	unsigned int scrHeight;
-	unsigned int perspec; //whether the scene is perspective
+	bool perspec; //whether the scene is perspective
 	unsigned int count; //this is used for every object's id in the scene
 	Camera camera;
 	std::unordered_map<unsigned int, Model> models;
@@ -169,16 +176,11 @@ private:
 	std::unordered_map<unsigned int, DirLight> dirLights;
 	std::unordered_map<unsigned int, PointLight> pointLights;
 
-	//helper functions to send lights to shaders
-	void sendPointLights(Shader &shader);
-	void sendDirLights(Shader &shader);
-	void sendSpotLights(Shader &shader);
 	//set model's shader with position matrices
 	//this function may be changed due to different shaders
-	void setShader(Shader &shader, glm::mat4 model, glm::mat4 view, glm::mat4 proj);
+	void setShader(Model &obj, glm::mat4 model, glm::mat4 view, glm::mat4 proj);
 	//send all lights in the scene to models' shaders
-	//This function should be called in order to enable new added or edited lights
-	void sendLights();
+	void sendLights(Model &model);
 
 };
 

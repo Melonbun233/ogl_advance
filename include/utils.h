@@ -12,7 +12,5 @@
 #include "spotLight.h"
 #include "config.h"
 
-//initilize the window and glad
-GLFWwindow* initWindow(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT, const std::string name);
 
 #endif

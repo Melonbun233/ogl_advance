@@ -15,9 +15,6 @@ float delta_time = 0.0;
 float current_frame = 0.0;
 float last_frame = 0.0;
 
-const extern float cube_vertices[];
-const extern vec3 cube_pos[];
-
 //setting up scene and camera
 //init and config scene, set the camera at (0, 0, 6)
 Scene scene(vec3(0, 0, 6), SCR_WIDTH, SCR_HEIGHT);
@@ -49,20 +46,22 @@ int main(int argc, char *argv[]){
 
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
-	PointLight pointLights[] = {
-		PointLight(vec3(3.0, 2.0, -1.0), 50.0f),
-		PointLight(vec3(0.0, 0.0, -15.0), 50.0f)
-	};
+	//white
+	SceneID white = scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3),
+		vec3(0.1), vec3(1.0), vec3(1.0));
+	//red
+	SceneID red = scene.addDirLight(vec3(1.0, 0.0, 0.0), vec3(0.2, 1.0, 0.3), 
+		vec3(0.1), vec3(1.0), vec3(1.0));
+	//green
+	scene.addDirLight(vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, -4.0), vec3(0.1), vec3(1.0), vec3(1.0));
 
-	SpotLight spotLights[] = {
-		SpotLight(vec3(-1.0, -2.0, -2.0), vec3(1.0, 2.0, 2.0), 20.0, 22.0),
-		SpotLight(vec3(-3.0, -2.0, -1.0), vec3(3.0, 2.0, -1.0), 20.0, 23.0)
-	};
-	spotLights[0].color = vec3(0.0, 1.0, 0.0);
-
-	scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3), vec3(0.1), vec3(1.0), vec3(1.0));
-	scene.addDirLight(vec3(1.0, 0.0, 0.0), vec3(0.2, 1.0, 0.3), vec3(0.1), vec3(1.0), vec3(1.0));
-	scene.addPointLight(vec3(6.0, 4.0, -2.0), 1000.0f);
+	scene.addSpotLight(vec3(-1.0, -2.0, -2.0), vec3(1.0, 2.0, 2.0), 20.0, 22.0);
+	scene.removeDirLight(white);
+	//test changing red color to blue
+	DirLight *red_ptr = scene.getDirLight(red);
+	red_ptr->color = vec3(0.0, 0.0, 1.0);
+	//scene.addPointLight(vec3(0.0, 0.0, -4.0), 100.0f);
+	//scene.addPointLight(vec3(0.0, 0.0, 4.0), 100.0f);
 
 	//-----------------------resndering loop---------------------------------//
 	while (!glfwWindowShouldClose(window)){
@@ -72,14 +71,14 @@ int main(int argc, char *argv[]){
 		delta_time = current_frame - last_frame;
 		last_frame = current_frame;
 		//clear last frame
-		glClearColor(0, 0, 0, 1.0f);
+		glClearColor(0.25, 0.25, 0.25, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//update model, view, projection
 		mat4 nano_model;
 		nano_model = translate(nano_model, vec3(0.0f, -1.75f, 0.0f));
 		nano_model = scale(nano_model, vec3(0.3));
-		scene.setPosition(model_id, nano_model);
+		scene.setModelPos(model_id, nano_model);
 
 		//draw objects
 		scene.render();

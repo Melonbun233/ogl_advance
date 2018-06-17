@@ -22,6 +22,10 @@ extern float delta_time, MOUSE_X, MOUSE_Y;
 extern GLboolean MOUSE_FIRST;
 extern Camera *camera;
 
+
+//initilize the window and glad
+GLFWwindow* initWindow(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT, const std::string name);
+
 //process user input in the render loop
 //PRE:
 // window: user's window
