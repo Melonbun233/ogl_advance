@@ -8,7 +8,7 @@ using namespace std;
 using namespace glm;
 
 const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 800;
+const unsigned int SCR_HEIGHT = 600;
 const string window_name = "Advanced OpenGL";
 
 float delta_time = 0.0;
@@ -41,27 +41,25 @@ int main(int argc, char *argv[]){
 	const string fshader_path = curr_dir + "/../resources/shader/light.fs";
 	const string nano_path = curr_dir + "/../resources/objects/nanosuit/nanosuit.obj";
 	//slime/DirtSlime.fbx";
+	//nanosuit model
+	SceneID nano_id = scene.addModel(nano_path, vshader_path, fshader_path);
+	mat4 nano_model;
+	nano_model = translate(nano_model, vec3(0.0f, -1.75f, 0.0f));
+	nano_model = scale(nano_model, vec3(0.3));
 
-	SceneID model_id = scene.addModel(nano_path, vshader_path, fshader_path);
+
+	//ground model
+	Material ground_mat;
+	ground_mat.diffuse = vec3(1.0f, 1.0f, 1.0f);
+	vector<string> ground_tex;
+	SceneID ground = scene.addPlane(vshader_path, fshader_path, ground_mat, ground_tex);
+
 
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
 	//white
-	SceneID white = scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3),
-		vec3(0.1), vec3(1.0), vec3(1.0));
-	//red
-	SceneID red = scene.addDirLight(vec3(1.0, 0.0, 0.0), vec3(0.2, 1.0, 0.3), 
-		vec3(0.1), vec3(1.0), vec3(1.0));
-	//green
-	scene.addDirLight(vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, -4.0), vec3(0.1), vec3(1.0), vec3(1.0));
-
-	scene.addSpotLight(vec3(-1.0, -2.0, -2.0), vec3(1.0, 2.0, 2.0), 20.0, 22.0);
-	scene.removeDirLight(white);
-	//test changing red color to blue
-	DirLight *red_ptr = scene.getDirLight(red);
-	red_ptr->color = vec3(0.0, 0.0, 1.0);
-	//scene.addPointLight(vec3(0.0, 0.0, -4.0), 100.0f);
-	//scene.addPointLight(vec3(0.0, 0.0, 4.0), 100.0f);
+	SceneID dir_white = scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3),
+		vec3(0.1), vec3(2.0), vec3(1.0));
 
 	//-----------------------resndering loop---------------------------------//
 	while (!glfwWindowShouldClose(window)){
@@ -71,15 +69,12 @@ int main(int argc, char *argv[]){
 		delta_time = current_frame - last_frame;
 		last_frame = current_frame;
 		//clear last frame
-		glClearColor(0.25, 0.25, 0.25, 1.0f);
+		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//update model, view, projection
-		mat4 nano_model;
-		nano_model = translate(nano_model, vec3(0.0f, -1.75f, 0.0f));
-		nano_model = scale(nano_model, vec3(0.3));
-		scene.setModelPos(model_id, nano_model);
-
+		scene.setModelPos(nano_id, nano_model);
+		scene.setModelPos(ground, mat4(0));
 		//draw objects
 		scene.render();
 

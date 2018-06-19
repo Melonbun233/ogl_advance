@@ -11,7 +11,7 @@ void Model::render()
 		meshes[i].render(shader);
 }
 
-void Model::loadModel(const string path)
+void Model::loadAiModel(const string path)
 {
 	Importer importer;
 	//get scene using assimp
@@ -24,6 +24,36 @@ void Model::loadModel(const string path)
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
+}
+
+void Model::loadManualModel(vector<vec3> positions, vector<vec3> normals,
+	vector<unsigned int> indices, vector<vec2> coords, Material mat, vector<string> tex_path)
+{
+	vector<Vertex> vertices;
+	vector<Texture> textures;
+	//proceed all vertices
+	for (int i = 0; i < positions.size(); i ++)
+		vertices.push_back(Vertex(positions[i], normals[i], coords[i]));
+	//check texture string
+	if (tex_path.size() == 3) { //this model doesn't contain texture
+		if (tex_path[1] != "") //existing ambient texture
+		{
+			unsigned int ambient = loadTexture(tex_path[0]);
+			textures.push_back(Texture(ambient, "ambient", tex_path[0]));
+		}
+		if(tex_path[2] != "") //existing diffuse texture
+		{
+			unsigned int diffuse = loadTexture(tex_path[1]);
+			textures.push_back(Texture(diffuse, "diffuse", tex_path[1]));
+		}
+		if(tex_path[3] != "") //existing specular texture
+		{
+			unsigned int specular = loadTexture(tex_path[2]);
+			textures.push_back(Texture(specular, "specular", tex_path[2]));
+		}
+	}
+
+	meshes.push_back(Mesh(vertices, indices, textures, mat));
 }
 
 void Model::processNode(aiNode *root, const aiScene *scene)
@@ -123,7 +153,7 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial *material, aiTextureType 
 		//texture already loaded
 		if(!skip)
 		{
-			Texture texture = {getTextureID(str.C_Str(), directory), type_name, str.C_Str()};
+			Texture texture = {loadTexture(str.C_Str(), directory), type_name, str.C_Str()};
 			textures.push_back(texture);
 			textures_loaded.push_back(texture);
 		}
@@ -131,9 +161,14 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial *material, aiTextureType 
 	return textures;
 }
 
-unsigned int Model::getTextureID(const string &path, const string &directory)
+unsigned int Model::loadTexture(const string &path, const string &directory)
 {
 	string filename = directory + '/' + path;
+	return loadTexture(filename);
+}
+
+unsigned int Model::loadTexture(const string filename)
+{
 	unsigned int ID;
 	glGenTextures(1, &ID);
 
@@ -161,7 +196,7 @@ unsigned int Model::getTextureID(const string &path, const string &directory)
 	}
 	else
 	{
-		cout << "Texture failed to load at path: " << path << endl;
+		cout << "Texture failed to load at path: " << endl << filename << endl;
 		stbi_image_free(data);
 	}
 

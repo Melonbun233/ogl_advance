@@ -15,12 +15,22 @@ struct Vertex {
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 texCoords;
+
+	Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 coord) : 
+	position(position), normal(normal), texCoords(coord) {}
+
+	Vertex() = default;
 };
 
 struct Texture {
 	unsigned int ID;
 	std::string type;
 	std::string path;
+
+	Texture(unsigned int ID, std::string type, std::string path) :
+	ID(ID), type(type), path(path) {}
+
+	Texture() = default;
 };
 
 //material for this mesh
@@ -29,6 +39,11 @@ struct Material {
 	glm::vec3 diffuse;
 	glm::vec3 specular;
 	float shininess;
+
+	Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess) :
+	ambient(ambient), diffuse(diffuse), specular(specular), shininess(shininess) {}
+
+	Material() = default;
 };
 
 

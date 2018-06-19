@@ -14,11 +14,9 @@ void Scene::setModelPos(SceneID id, mat4 pos)
 			Model model = search->second;
 			mat4 view, proj;
 			view = camera.getView();
-			if (perspec)
-				proj = perspective(radians(camera.getFOV()), float(scrWidth)/float(scrHeight),
-					0.1f, 100.0f);
-			else
-				proj = ortho(0.0f, float(scrWidth), 0.0f, float(scrHeight), 0.1f, 100.0f);
+			proj = getProjMat();
+			//scaling the object to fit screen
+			//pos = scale(pos, vec3(float(scrHeight)/float(scrWidth), 1, 1));
 			//set model's shader
 			setShader(model, pos, view, proj);
 		}
@@ -76,6 +74,41 @@ SceneID Scene::addModel(const string path, const string vshader, const string fs
 	unsigned int id = count ++;
 	models.insert({id, model});
 	return SceneID(id, MODEL);
+}
+
+SceneID Scene::addPlane(const string vshader, const string fshader, Material &mat,
+	vector<string> &tex_path)
+{
+	Shader shader(vshader, fshader);
+	Model model = loadModel(shader, square_vertices, square_indices, square_vertices_num, 
+		square_indices_num, mat, tex_path);
+	//assign id
+	unsigned int id = count ++;
+	models.insert({id, model});
+	return SceneID(id, MODEL);
+}
+
+Model Scene::loadModel(Shader &shader, const float vertices[], const unsigned int indices[], 
+	const int vertex_num, const int index_num, Material &mat, vector<string> &tex_path)
+{
+	//load model
+	vector<vec3> positions, normals;
+	vector<vec2> coords;
+	vector<unsigned int> index;
+
+	for(int i = 0; i < vertex_num; i ++)
+	{
+		positions.push_back(vec3(vertices[i*8], vertices[1+i*8], vertices[2+i*8]));
+		coords.push_back(vec2(vertices[3+i*8], vertices[4+i*8]));
+		normals.push_back(vec3(vertices[5+i*8], vertices[6+i*8], vertices[7+i*8]));
+	}
+
+	for(int i = 0; i < index_num; i ++)
+	{
+		index.push_back(indices[i]);
+	}
+
+	return Model(shader, positions, normals, index, coords, mat, tex_path);
 }
 
 SceneID Scene::addSpotLight(vec3 direction, vec3 position, float inner, float outer)
@@ -236,4 +269,16 @@ Model* Scene::getModel(SceneID ID)
 Camera* Scene::getCamera()
 {
 	return &camera;
+}
+
+mat4 Scene::getProjMat()
+{
+	mat4 proj;
+	if (perspec)
+		proj = perspective(radians(camera.getFOV()), float(scrWidth)/float(scrHeight),
+			0.1f, 100.0f);
+	else
+		proj = ortho(0.0f, float(scrWidth), 0.0f, float(scrHeight), 0.1f, 100.0f);
+
+	return proj;
 }

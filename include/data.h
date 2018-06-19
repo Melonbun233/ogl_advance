@@ -8,16 +8,18 @@
 //	the first 3 floats are the position of the vertex
 //  the next 3 floats are the RGB color value of the vertex
 //  the last 2 floats are the texture coordinates of this vertex
+const int square_vertices_num = 4;
 const float square_vertices[] = {
-	//positions				//colors, optional		// texture coords
-	 0.5f,  0.5f, 0.5f, 	1.0f, 0.0f, 0.0f,   	1.0f, 1.0f,	// top right
-	 0.5f, -0.5f, 0.5f,		0.0f, 1.0f, 0.0f,   	1.0f, 0.0f,	// bottom right
-	-0.5f, -0.5f, 0.5f, 	0.0f, 0.0f, 1.0f,   	0.0f, 0.0f,	// bottom left
-	-0.5f,  0.5f, 0.5f, 	1.0f, 1.0f, 0.0f,   	0.0f, 1.0f 	// top right
+	//positions		       //texture coords //normal
+	 0.5f,  0.5f, 0.5f,    1.0f, 1.0f,	    0.0f, 1.0f, 0.0f,// top right
+	 0.5f, -0.5f, 0.5f,    1.0f, 0.0f,	    0.0f, 1.0f, 0.0f,// bottom right
+	-0.5f, -0.5f, 0.5f,    0.0f, 0.0f,	    0.0f, 1.0f, 0.0f,// bottom left
+	-0.5f,  0.5f, 0.5f,    0.0f, 1.0f, 	    0.0f, 1.0f, 0.0f// top right
 };
 
 //this array is used to describe the order that OpenGL should draw a squre
-const float square_indices[] = {
+const int square_indices_num = 6;
+const unsigned int square_indices[] = {
 	0, 1, 3,
 	1, 2, 3
 };

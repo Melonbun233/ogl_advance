@@ -10,11 +10,13 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "shader.h"
 #include "model.h"
+#include "mesh.h"
 #include "light.h"
 #include "spotLight.h"
 #include "dirLight.h"
 #include "pointLight.h"
 #include "camera.h"
+#include "data.h"
 
 enum OBJECT_TYPE {
 	MODEL,
@@ -53,6 +55,7 @@ public:
 	//set object's model view.
 	//this function will also set shaders' projection and view matrices
 	//you can call setPerspec to set the projection of the scene
+	//NOTE: this function must be called otherwise the model is not rendered in the scene
 	//PRE: 
 	//	model_id: scene id of the model need to be positioned. this should be valid, otherwise
 	//		nothing will be done
@@ -82,6 +85,15 @@ public:
 	//	this ID should be kept in order to delete or edit the model
 	SceneID addModel(const std::string path, const std::string vshader_path, 
 		const std::string fshader_path);
+
+	//add a standard squre plane at the center of xy plane, this is a model
+	//PRE:
+	//  vshader, fshader: vertex and fragment shader path
+	//	mat: material of the plane
+	//	tex_path: texture path of 3 different kind of textures. If one texture does't exist,
+	//	use empty string. If no texture is used for this plane, use empty vector
+	SceneID addPlane(const std::string vshader, const std::string fshader, 
+		Material &mat, std::vector<std::string> &tex_path);
 
 	//add a spot light into the scene
 	//PRE: 
@@ -181,6 +193,13 @@ private:
 	void setShader(Model &obj, glm::mat4 model, glm::mat4 view, glm::mat4 proj);
 	//send all lights in the scene to models' shaders
 	void sendLights(Model &model);
+
+	//construct a model 
+	Model loadModel(Shader &shader, const float vertices[], const unsigned int indices[], 
+		const int vertex_size, const int index_size, Material &mat, std::vector<std::string> &tex_path);
+
+	//get projection matrix
+	glm::mat4 getProjMat();
 
 };
 
