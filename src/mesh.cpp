@@ -37,7 +37,6 @@ void Mesh::setup()
 
 void Mesh::render(Shader &shader)
 {
-	shader.use();
 	//counters uesd for texture name
 	unsigned int counter_amb = 0;
 	unsigned int counter_diff = 0;
@@ -97,5 +96,8 @@ std::ostream& operator<< (std::ostream &os, const Mesh &mesh)
 		os << "textures[" << i << "]: " << endl;
 		os << mesh.textures[i] << endl;
 	}
+	//material
+	os << "Material: " << endl;
+	os << mesh.material << endl;
 	return os;
 }

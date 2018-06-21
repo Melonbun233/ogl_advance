@@ -91,6 +91,18 @@ SceneID Scene::addPlane(const string vshader, const string fshader, Material &ma
 	return SceneID(id, MODEL);
 }
 
+SceneID Scene::addCube(const string vshader, const string fshader, Material &mat,
+	vector<string> &tex_path)
+{
+	Shader shader(vshader, fshader);
+	Model model = loadModel(shader, cube_vertices, cube_indices, cube_vertices_num,
+		cube_indices_num, mat, tex_path);
+	//assign id
+	unsigned int id = count ++;
+	models.insert({id, model});
+	return SceneID(id, MODEL);
+}
+
 Model Scene::loadModel(Shader &shader, const float vertices[], const unsigned int indices[], 
 	const int vertex_num, const int index_num, Material &mat, vector<string> &tex_path)
 {

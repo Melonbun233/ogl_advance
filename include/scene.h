@@ -91,8 +91,9 @@ public:
 	//	mat: material of the plane
 	//	tex_path: texture path of 3 different kind of textures. If one texture does't exist,
 	//	use empty string. If no texture is used for this plane, use empty vector
-	SceneID addPlane(const std::string vshader, const std::string fshader, 
-		Material &mat, std::vector<std::string> &tex_path);
+	SceneID addPlane(const std::string, const std::string, Material&, std::vector<std::string>&);
+
+	SceneID addCube(const std::string, const std::string, Material&, std::vector<std::string>&);
 
 	//add a spot light into the scene
 	//PRE: 

@@ -54,7 +54,7 @@ public:
 	std::string directory;
 	//shader used for this model
 	Shader shader;
-		std::vector<Mesh> meshes;
+	std::vector<Mesh> meshes;
 
 private:
 	//store loaded textures to optimize
