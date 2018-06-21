@@ -53,9 +53,7 @@ public:
 	}
 
 	//set object's model view.
-	//this function will also set shaders' projection and view matrices
 	//you can call setPerspec to set the projection of the scene
-	//NOTE: this function must be called otherwise the model is not rendered in the scene
 	//PRE: 
 	//	model_id: scene id of the model need to be positioned. this should be valid, otherwise
 	//		nothing will be done
@@ -70,6 +68,7 @@ public:
 	bool isPerspective() {return perspec;}
 
 	//render all models and lights in the scene
+	//this function will also update every models' view and projection matrices to fit the camera
 	void render();
 
 /*	---------------------------------------------------------------------------------------
@@ -188,13 +187,14 @@ private:
 	std::unordered_map<unsigned int, DirLight> dirLights;
 	std::unordered_map<unsigned int, PointLight> pointLights;
 
-	//set model's shader with position matrices
-	//this function may be changed due to different shaders
-	void setShader(Model &obj, glm::mat4 model, glm::mat4 view, glm::mat4 proj);
+	//set model's view and projection matrices
+	//model's position should be set in the setModelPos function
+	void setShader(Model &obj, glm::mat4 view, glm::mat4 proj);
+
 	//send all lights in the scene to models' shaders
 	void sendLights(Model &model);
 
-	//construct a model 
+	//manually construct a model 
 	Model loadModel(Shader &shader, const float vertices[], const unsigned int indices[], 
 		const int vertex_size, const int index_size, Material &mat, std::vector<std::string> &tex_path);
 

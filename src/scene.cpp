@@ -12,23 +12,21 @@ void Scene::setModelPos(SceneID id, mat4 pos)
 		if(search != models.end())
 		{
 			Model model = search->second;
-			mat4 view, proj;
-			view = camera.getView();
-			proj = getProjMat();
-			//scaling the object to fit screen
-			//pos = scale(pos, vec3(float(scrHeight)/float(scrWidth), 1, 1));
-			//set model's shader
-			setShader(model, pos, view, proj);
+			model.shader.use();
+			model.shader.setMat4("model", pos);
+			return;
 		}
+		cout << "Model ID not found" << endl;
+		return;
 	}
+	cout << "Invalid ID: not MODEL";
 }
 
-void Scene::setShader(Model &obj, mat4 model, mat4 view, mat4 proj)
+void Scene::setShader(Model &obj, mat4 view, mat4 proj)
 {
 	obj.shader.use();
 	obj.shader.setMat4("view", view);
 	obj.shader.setMat4("proj", proj);
-	obj.shader.setMat4("model", model);
 	obj.shader.setVec3("viewPos", camera.Position);
 }
 
@@ -37,6 +35,11 @@ void Scene::render()
 	for (auto it = models.begin(); it != models.end(); it++)
 	{
 		sendLights(it->second);
+		//updating view and projection matrices
+		mat4 view, proj;
+		view = camera.getView();
+		proj = getProjMat();
+		setShader(it->second, view, proj);
 		it->second.render();
 	}
 }
@@ -188,8 +191,14 @@ void Scene::removeSpotLight(SceneID ID)
 	{
 		auto search = spotLights.find(ID.id);
 		if (search != spotLights.end())
+		{
 			spotLights.erase(search);
+			return;
+		}
+		cout << "Spot Light ID not found" << endl;
+		return;
 	} 
+	cout << "Invalid ID: not SpotLight" << endl;
 }
 
 void Scene::removeDirLight(SceneID ID)
@@ -198,8 +207,14 @@ void Scene::removeDirLight(SceneID ID)
 	{
 		auto search = dirLights.find(ID.id);
 		if (search != dirLights.end())
+		{
 			dirLights.erase(search);
+			return;
+		}
+		cout << "Directional Light ID not found" << endl;
+		return;
 	}
+	cout << "Invalid ID: not DirLight" << endl;
 }
 
 void Scene::removePointLight(SceneID ID)
@@ -208,8 +223,14 @@ void Scene::removePointLight(SceneID ID)
 	{
 		auto search = pointLights.find(ID.id);
 		if (search != pointLights.end())
+		{
 			pointLights.erase(search);
+			return;
+		}
+		cout << "Point Light ID not found" << endl;
+		return;
 	}
+	cout << "Invalid ID: not PointLight" << endl;
 }
 
 void Scene::removeModel(SceneID ID)
@@ -218,8 +239,14 @@ void Scene::removeModel(SceneID ID)
 	{
 		auto search = models.find(ID.id);
 		if (search != models.end())
+		{
 			models.erase(search);
+			return;
+		}
+		cout << "Model ID not found" << endl;
+		return;
 	}
+	cout << "Invalid ID: not MODEL" << endl;
 }
 
 SpotLight* Scene::getSpotLight(SceneID ID)
@@ -229,7 +256,10 @@ SpotLight* Scene::getSpotLight(SceneID ID)
 		auto search = spotLights.find(ID.id);
 		if (search != spotLights.end())
 			return &(search->second);
+		cout << "Spot Light ID not found" << endl;
+		return NULL;
 	}
+	cout << "Invalid ID: not SpotLight" << endl;
 	return NULL;
 }
 
@@ -240,7 +270,10 @@ DirLight* Scene::getDirLight(SceneID ID)
 		auto search = dirLights.find(ID.id);
 		if (search != dirLights.end())
 			return &(search->second);
+		cout << "Directional Light ID not found" << endl;
+		return NULL;
 	}
+	cout << "Invalid ID: not DirLight" << endl;
 	return NULL;
 }
 
@@ -251,7 +284,10 @@ PointLight* Scene::getPointLight(SceneID ID)
 		auto search = pointLights.find(ID.id);
 		if(search != pointLights.end())
 			return &(search->second);
+		cout << "Point Light ID not found" << endl;
+		return NULL;
 	}
+	cout << "Invalid ID: not Point Light";
 	return NULL;
 }
 
@@ -262,7 +298,10 @@ Model* Scene::getModel(SceneID ID)
 		auto search = models.find(ID.id);
 		if(search != models.end())
 			return &(search->second);
+		cout << "Model ID not found" << endl;
+		return NULL;
 	}
+	cout << "Invalid ID: not Model" << endl;
 	return NULL;
 }
 

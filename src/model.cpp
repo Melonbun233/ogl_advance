@@ -26,33 +26,34 @@ void Model::loadAiModel(const string path)
 	processNode(scene->mRootNode, scene);
 }
 
-void Model::loadManualModel(vector<vec3> positions, vector<vec3> normals,
-	vector<unsigned int> indices, vector<vec2> coords, Material mat, vector<string> tex_path)
+void Model::loadManualModel(vector<vec3> &positions, vector<vec3> &normals,
+	vector<unsigned int> &indices, vector<vec2> &coords, Material &mat, vector<string> &tex_path)
 {
 	vector<Vertex> vertices;
 	vector<Texture> textures;
+
 	//proceed all vertices
 	for (int i = 0; i < positions.size(); i ++)
 		vertices.push_back(Vertex(positions[i], normals[i], coords[i]));
 	//check texture string
 	if (tex_path.size() == 3) { //this model doesn't contain texture
-		if (tex_path[1] != "") //existing ambient texture
+		if (tex_path[0] != "") //existing ambient texture
 		{
 			unsigned int ambient = loadTexture(tex_path[0]);
 			textures.push_back(Texture(ambient, "ambient", tex_path[0]));
 		}
-		if(tex_path[2] != "") //existing diffuse texture
+		if(tex_path[1] != "") //existing diffuse texture
 		{
 			unsigned int diffuse = loadTexture(tex_path[1]);
 			textures.push_back(Texture(diffuse, "diffuse", tex_path[1]));
 		}
-		if(tex_path[3] != "") //existing specular texture
+		if(tex_path[2] != "") //existing specular texture
 		{
 			unsigned int specular = loadTexture(tex_path[2]);
 			textures.push_back(Texture(specular, "specular", tex_path[2]));
 		}
 	}
-
+ 
 	meshes.push_back(Mesh(vertices, indices, textures, mat));
 }
 

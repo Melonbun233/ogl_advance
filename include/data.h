@@ -10,11 +10,11 @@
 //  the last 2 floats are the texture coordinates of this vertex
 const int square_vertices_num = 4;
 const float square_vertices[] = {
-	//positions		       //texture coords //normal
-	 0.5f,  0.5f, 0.5f,    1.0f, 1.0f,	    0.0f, 1.0f, 0.0f,// top right
-	 0.5f, -0.5f, 0.5f,    1.0f, 0.0f,	    0.0f, 1.0f, 0.0f,// bottom right
-	-0.5f, -0.5f, 0.5f,    0.0f, 0.0f,	    0.0f, 1.0f, 0.0f,// bottom left
-	-0.5f,  0.5f, 0.5f,    0.0f, 1.0f, 	    0.0f, 1.0f, 0.0f// top right
+	//positions		      //texture coords //normal
+	0.5f, 0.0f, 0.5f,     1.0f, 1.0f,      0.0f, 1.0f, 0.0f,// top right
+	0.5f, 0.0f, -0.5f,    1.0f, 0.0f,      0.0f, 1.0f, 0.0f,// bottom right
+	-0.5f, 0.0f, -0.5f,   0.0f, 0.0f,      0.0f, 1.0f, 0.0f,// bottom left
+	-0.5f, 0.0f, 0.5f,    0.0f, 1.0f,      0.0f, 1.0f, 0.0f// top right
 };
 
 //this array is used to describe the order that OpenGL should draw a squre
@@ -28,6 +28,7 @@ const unsigned int square_indices[] = {
 //for each vertex,
 // the first 3 floats are the position of the vertex
 // the next 2 floats are the texture coordinates of this vertex
+const int cube_vertices_num = 36;
 const float cube_vertices[] = {
 	//positions			  //texture coords	//normal
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,       0.0f, 0.0f, -1.0f,
@@ -73,18 +74,20 @@ const float cube_vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,       0.0f, 1.0f, 0.0f
 };
 
-//this array is used to specify 10 cubes position
-const glm::vec3 cube_pos[] = {
-	glm::vec3( 0.0f,  0.0f,  0.0f), 
-	glm::vec3( 2.0f,  5.0f, -15.0f), 
-	glm::vec3(-1.5f, -2.2f, -2.5f),  
-	glm::vec3(-3.8f, -2.0f, -12.0f),  
-	glm::vec3( 2.4f, -0.4f, -3.5f),  
-	glm::vec3(-1.7f,  3.0f, -7.5f),  
-	glm::vec3( 1.3f, -2.0f, -2.5f),  
-	glm::vec3( 1.5f,  2.0f, -2.5f), 
-	glm::vec3( 1.5f,  0.2f, -1.5f), 
-	glm::vec3(-1.3f,  1.0f, -1.5f) 
+const int cube_indices_num = 36;
+const unsigned int cube_indices[] = {
+    0, 1, 2,
+    3, 4, 5,
+    6, 7, 8,
+    9, 10, 11,
+    12, 13, 14,
+    15, 16, 17,
+    18, 19, 20,
+    21, 22, 23,
+    24, 25, 26,
+    27, 28, 29,
+    30, 31, 32,
+    33, 34, 35,
 };
 
 #endif

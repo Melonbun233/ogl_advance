@@ -39,8 +39,8 @@ public:
 	// 		they should be in the same directory, if the texture doesn't exist, use empty string
 	//		if this model doesn't contain any texture, use empty vector
 	//NOTE: the size of the positions, normals and coords arrays should have exactly the same size
-	Model(Shader &shader, std::vector<glm::vec3> positions, std::vector<glm::vec3> normals,
-		std::vector<unsigned int> indices, std::vector<glm::vec2> coords, Material &mat,
+	Model(Shader &shader, std::vector<glm::vec3> &positions, std::vector<glm::vec3> &normals,
+		std::vector<unsigned int> &indices, std::vector<glm::vec2>  coords, Material &mat,
 		std::vector<std::string> &tex_path) : shader(shader)
 	{
 		loadManualModel(positions, normals, indices, coords, mat, tex_path);
@@ -54,19 +54,20 @@ public:
 	std::string directory;
 	//shader used for this model
 	Shader shader;
+		std::vector<Mesh> meshes;
 
 private:
 	//store loaded textures to optimize
 	std::vector<Texture> textures_loaded; 
 	//model data
-	std::vector<Mesh> meshes;
+
 	//load the model using assimp
 	void loadAiModel(const std::string path);
 
 	//load the model with raw datas and textures
-	void loadManualModel(std::vector<glm::vec3> positions, std::vector<glm::vec3> normals,
-		std::vector<unsigned int> indices, std::vector<glm::vec2> coords, Material mat, 
-		std::vector<std::string> tex_path);
+	void loadManualModel(std::vector<glm::vec3> &positions, std::vector<glm::vec3> &normals,
+		std::vector<unsigned int> &indices, std::vector<glm::vec2> &coords, Material &mat, 
+		std::vector<std::string> &tex_path);
 	//recursively process each node and it's children
 	void processNode(aiNode *node, const aiScene *scene);
 	//process a specific mesh to our defined mesh object

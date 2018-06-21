@@ -37,6 +37,7 @@ void Mesh::setup()
 
 void Mesh::render(Shader &shader)
 {
+	shader.use();
 	//counters uesd for texture name
 	unsigned int counter_amb = 0;
 	unsigned int counter_diff = 0;
@@ -71,4 +72,30 @@ void Mesh::render(Shader &shader)
 	glBindVertexArray(0);
 
 	glActiveTexture(GL_TEXTURE0);
+}
+
+std::ostream& operator<< (std::ostream &os, const Mesh &mesh)
+{
+	//vertices
+	os << "Vertices num: " << mesh.vertices.size() << endl;
+	for (int i = 0; i < mesh.vertices.size(); i ++)
+	{
+		os << "vertices[" << i << "]:" << endl;
+		os << mesh.vertices[i] << endl;
+	}
+	//indices
+	os << "Indices num: " << mesh.indices.size() << endl;
+	for (int i = 0; i < mesh.indices.size(); i ++)
+	{
+		os << mesh.indices[i] << " ";
+	}
+	os << endl << endl;
+	//textures
+	os << "Textures num: " << mesh.textures.size() << endl;
+	for (int i = 0; i < mesh.textures.size(); i ++)
+	{
+		os << "textures[" << i << "]: " << endl;
+		os << mesh.textures[i] << endl;
+	}
+	return os;
 }

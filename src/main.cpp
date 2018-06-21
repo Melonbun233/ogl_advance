@@ -46,14 +46,22 @@ int main(int argc, char *argv[]){
 	mat4 nano_model;
 	nano_model = translate(nano_model, vec3(0.0f, -1.75f, 0.0f));
 	nano_model = scale(nano_model, vec3(0.3));
-
+	scene.setModelPos(nano_id, nano_model);
 
 	//ground model
 	Material ground_mat;
-	ground_mat.diffuse = vec3(1.0f, 1.0f, 1.0f);
+	ground_mat.ambient = vec3(1.0f);
+	ground_mat.diffuse = vec3(1.0f);
 	vector<string> ground_tex;
+	ground_tex.push_back("");
+	ground_tex.push_back("../resources/textures/container.png");
+	ground_tex.push_back("");
 	SceneID ground = scene.addPlane(vshader_path, fshader_path, ground_mat, ground_tex);
+	scene.setModelPos(ground, mat4(0));
 
+	//test
+	Model *test = scene.getModel(nano_id);
+	cout << test->meshes[0] << endl;
 
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
@@ -69,12 +77,9 @@ int main(int argc, char *argv[]){
 		delta_time = current_frame - last_frame;
 		last_frame = current_frame;
 		//clear last frame
-		glClearColor(0, 0, 0, 1.0f);
+		glClearColor(0.25, 0.25, 0.25, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//update model, view, projection
-		scene.setModelPos(nano_id, nano_model);
-		scene.setModelPos(ground, mat4(0));
 		//draw objects
 		scene.render();
 
