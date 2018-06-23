@@ -19,7 +19,7 @@
 using namespace std;
 
 extern float delta_time, MOUSE_X, MOUSE_Y;
-extern GLboolean MOUSE_FIRST;
+extern bool MOUSE_FIRST;
 extern Camera *camera;
 
 

@@ -7,8 +7,8 @@
 using namespace std;
 using namespace glm;
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1200;
+const unsigned int SCR_HEIGHT = 900;
 const string window_name = "Advanced OpenGL";
 
 float delta_time = 0.0;
@@ -19,8 +19,6 @@ float last_frame = 0.0;
 //init and config scene, set the camera at (0, 0, 6)
 Scene scene(vec3(0, 1, 3), SCR_WIDTH, SCR_HEIGHT);
 Camera *camera;
-float MOUSE_X, MOUSE_Y;
-GLboolean MOUSE_FIRST = true;
 GLboolean MOUSE_VERTICAL_INVERSE = true;
 GLboolean MOUSE_HORIZONTAL_INVERSE = false;
 
@@ -37,28 +35,34 @@ int main(int argc, char *argv[]){
 
 	//configure paths
 	const string curr_dir = string(argv[0]).substr(0, string(argv[0]).find_last_of('/'));
-	const string vshader_path = curr_dir + "/../resources/shader/vshader.vs";
-	const string fshader_path = curr_dir + "/../resources/shader/light.fs";
+	const string vshader = curr_dir + "/../resources/shader/vshader.vs";
+	const string fshader = curr_dir + "/../resources/shader/light.fs";
+	const string fshader_depth = curr_dir + "/../resources/shader/depth.fs";
 	const string nano_path = curr_dir + "/../resources/objects/nanosuit/nanosuit.obj";
+	const string tex_floor = curr_dir + "/../resources/textures/floor.jpg";
+	const string tex_stone = curr_dir + "/../resources/textures/stone.jpg";
 
 	//ground model
-	Material ground_mat(vec3(0.2f), vec3(1.0f), vec3(1.0f), 64.0f);
-	vector<string> ground_tex;
-	ground_tex.push_back("");
-	ground_tex.push_back("../resources/textures/container.png");
-	ground_tex.push_back("../resources/textures/container.png");
-	//SceneID ground = scene.addPlane(vshader_path, fshader_path, ground_mat, ground_tex);
-	SceneID cube = scene.addCube(vshader_path, fshader_path, ground_mat, ground_tex);
-	scene.setModelPos(cube, mat4(1.0f));
+	Material ground_mat(vec3(0), vec3(0), vec3(0), 8.0f);
+	vector<string> ground_tex = {tex_floor, tex_floor, tex_floor};
+	SceneID ground = scene.addPlane(vshader, fshader, ground_mat, ground_tex);
+	scene.setModelPos(ground, scale(mat4(1.0f), vec3(10.0f)));
+
+	Material cube_mat(vec3(0), vec3(0), vec3(0), 16.0f);
+	vector<string> cube_tex = {tex_stone, tex_stone, tex_stone};
+	SceneID cube_1 = scene.addCube(vshader, fshader, cube_mat, cube_tex);
+	scene.setModelPos(cube_1, translate(mat4(1.0f), vec3(0.0, 0.5001, 0.0)));
+
+	SceneID cube_2 = scene.addCube(vshader, fshader, cube_mat, cube_tex);
+	scene.setModelPos(cube_2, translate(mat4(1.0f), vec3(-1.5, 0.5001, -3.0)));
 
 
 	//--------------------------configure light------------------------------//
 	//direction/position, ambient, diffuse, specular, direction
 	//white
 	SceneID dir_white = scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3),
-		vec3(0.1), vec3(1.0), vec3(0.8));
-	SceneID dir_white2 = scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(0.2, 1.0, 0.3),
-		vec3(0.1), vec3(1.0), vec3(0.8));
+		vec3(0.2), vec3(0.5), vec3(0.8));
+
 
 	//-----------------------resndering loop---------------------------------//
 	while (!glfwWindowShouldClose(window)){

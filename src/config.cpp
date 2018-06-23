@@ -1,6 +1,9 @@
 #include "../include/config.h"
 //this file contains all config functions 
 
+float MOUSE_X, MOUSE_Y;
+bool MOUSE_FIRST = true;
+
 GLFWwindow* initWindow(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT, const string name){
 	//initiate glfw and window
 	glfwInit();
@@ -34,7 +37,7 @@ GLFWwindow* initWindow(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT, const st
 	}
 
 	glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_LESS);
 	return window;
 }
 
