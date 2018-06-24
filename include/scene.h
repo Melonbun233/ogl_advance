@@ -18,6 +18,7 @@
 #include "camera.h"
 #include "data.h"
 
+
 enum OBJECT_TYPE {
 	MODEL,
 	SPOT_LIGHT,
@@ -32,6 +33,7 @@ struct SceneID {
 	SceneID(unsigned int id, OBJECT_TYPE type) : id(id), type(type){}
 };
 
+
 /*
 	NOTE: every object in this scene has its own unique id
 	NOTE: if you want to explicitly control all objects, call getter functions to get its pointer.
@@ -44,8 +46,13 @@ class Scene
 {
 public:
 	//only set the camera
-	Scene(glm::vec3 cam_pos, unsigned int width, unsigned int height) 
+	Scene(const std::string dir, glm::vec3 cam_pos, unsigned int width, unsigned int height) 
 	{
+		curr_dir = dir;
+		vertex_normal = curr_dir + "/../resources/shader/General.vs";
+		fragment_normal = curr_dir + "/../resources/shader/General.fs";
+		fragment_depth = curr_dir + "/../resources/shader/Depth.fs";
+
 		camera = Camera(cam_pos); 
 		perspec = 1;
 		scrWidth = width;
@@ -77,23 +84,19 @@ public:
 	//add a model into the scene
 	//PRE: 
 	//	model: model added to the scene
-	//	vshader_path: vertex shader path
-	//	fshader_path: fragment shader path
 	//POST:
 	//	return an unique ID presenting this model
 	//	this ID should be kept in order to delete or edit the model
-	SceneID addModel(const std::string path, const std::string vshader_path, 
-		const std::string fshader_path);
+	SceneID addModel(const std::string path);
 
 	//add a standard squre plane at the center of xy plane, this is a model
 	//PRE:
-	//  vshader, fshader: vertex and fragment shader path
 	//	mat: material of the plane
 	//	tex_path: texture path of 3 different kind of textures. If one texture does't exist,
 	//	use empty string. If no texture is used for this plane, use empty vector
-	SceneID addPlane(const std::string, const std::string, Material&, std::vector<std::string>&);
+	SceneID addPlane(Material&, std::vector<std::string>&);
 
-	SceneID addCube(const std::string, const std::string, Material&, std::vector<std::string>&);
+	SceneID addCube(Material&, std::vector<std::string>&);
 
 	//add a spot light into the scene
 	//PRE: 
@@ -178,6 +181,12 @@ public:
 
 
 private:
+	//fragment and vertex shaders' path
+	std::string curr_dir;
+	std::string vertex_normal = curr_dir + "/../resources/shader/General.vs";
+	std::string fragment_normal = curr_dir + "/../resources/shader/General.fs";
+	std::string fragment_depth = curr_dir + "/../resources/shader/Depth.fs";
+
 	unsigned int scrWidth;
 	unsigned int scrHeight;
 	bool perspec; //whether the scene is perspective

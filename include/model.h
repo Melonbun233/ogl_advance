@@ -59,7 +59,10 @@ public:
 private:
 	//store loaded textures to optimize
 	std::vector<Texture> textures_loaded; 
-	//model data
+	//whether the model is outlined
+	bool outlined = false;
+	//model outlining color
+	glm::vec3 outline_color;
 
 	//load the model using assimp
 	void loadAiModel(const std::string path);

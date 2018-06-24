@@ -70,19 +70,19 @@ void Scene::sendLights(Model &model)
 	}
 }
 
-SceneID Scene::addModel(const string path, const string vshader, const string fshader)
+SceneID Scene::addModel(const string path)
 {
-	Shader shader(vshader, fshader);
+	Shader shader(vertex_normal, fragment_normal);
 	Model model(path, shader);
 	unsigned int id = count ++;
 	models.insert({id, model});
 	return SceneID(id, MODEL);
 }
 
-SceneID Scene::addPlane(const string vshader, const string fshader, Material &mat,
-	vector<string> &tex_path)
+SceneID Scene::addPlane(Material &mat, vector<string> &tex_path)
 {
-	Shader shader(vshader, fshader);
+	Shader shader(vertex_normal, fragment_normal);
+	cout << vertex_normal << ", " << fragment_normal << endl;
 	Model model = loadModel(shader, square_vertices, square_indices, square_vertices_num, 
 		square_indices_num, mat, tex_path);
 	//assign id
@@ -91,10 +91,9 @@ SceneID Scene::addPlane(const string vshader, const string fshader, Material &ma
 	return SceneID(id, MODEL);
 }
 
-SceneID Scene::addCube(const string vshader, const string fshader, Material &mat,
-	vector<string> &tex_path)
+SceneID Scene::addCube(Material &mat, vector<string> &tex_path)
 {
-	Shader shader(vshader, fshader);
+	Shader shader(vertex_normal, fragment_normal);
 	Model model = loadModel(shader, cube_vertices, cube_indices, cube_vertices_num,
 		cube_indices_num, mat, tex_path);
 	//assign id
