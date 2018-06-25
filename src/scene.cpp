@@ -11,9 +11,7 @@ void Scene::setModelPos(SceneID id, mat4 pos)
 		auto search = models.find(id.id);
 		if(search != models.end())
 		{
-			Model model = search->second;
-			model.shader.use();
-			model.shader.setMat4("model", pos);
+			search->second.pos = pos;
 			return;
 		}
 		cout << "Model ID not found" << endl;
@@ -22,9 +20,10 @@ void Scene::setModelPos(SceneID id, mat4 pos)
 	cout << "Invalid ID: not MODEL";
 }
 
-void Scene::setShader(Model &obj, mat4 view, mat4 proj)
+void Scene::setShader(Model &obj, mat4 &pos, mat4 &view, mat4 &proj)
 {
 	obj.shader.use();
+	obj.shader.setMat4("model", pos);
 	obj.shader.setMat4("view", view);
 	obj.shader.setMat4("proj", proj);
 	obj.shader.setVec3("viewPos", camera.Position);
@@ -32,14 +31,16 @@ void Scene::setShader(Model &obj, mat4 view, mat4 proj)
 
 void Scene::render()
 {
+	//render all normal objects
 	for (auto it = models.begin(); it != models.end(); it++)
 	{
 		sendLights(it->second);
 		//updating view and projection matrices
-		mat4 view, proj;
+		mat4 pos, view, proj;
+		pos = it->second.pos;
 		view = camera.getView();
 		proj = getProjMat();
-		setShader(it->second, view, proj);
+		setShader(it->second, pos, view, proj);
 		it->second.render();
 	}
 }
@@ -123,6 +124,23 @@ Model Scene::loadModel(Shader &shader, const float vertices[], const unsigned in
 	}
 
 	return Model(shader, positions, normals, index, coords, mat, tex_path);
+}
+
+void Scene::setOutline(SceneID ID, vec3 &color, bool outlined)
+{
+	if(ID.type == MODEL)
+	{
+		auto search = models.find(ID.id);
+		if(search != models.end())
+		{
+			search->second.setOutline(outlined);
+			search->second.setOutlineColor(color);
+			return;
+		}
+		cout << "Model ID not found" << endl;
+		return;
+	}
+	cout << "Invalid ID: not a Model" << endl;
 }
 
 SceneID Scene::addSpotLight(vec3 direction, vec3 position, float inner, float outer)

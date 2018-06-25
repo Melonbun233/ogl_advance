@@ -22,6 +22,11 @@ GLboolean MOUSE_VERTICAL_INVERSE = true;
 GLboolean MOUSE_HORIZONTAL_INVERSE = false;
 
 int main(int argc, char *argv[]){
+
+	GLFWwindow *window = initWindow(SCR_WIDTH, SCR_HEIGHT, window_name);
+	if(window == NULL)
+		return -1;
+
 	//configure paths
 	const string curr_dir = string(argv[0]).substr(0, string(argv[0]).find_last_of('/'));
 	const string nano_path = curr_dir + "/../resources/objects/nanosuit/nanosuit.obj";
@@ -30,19 +35,12 @@ int main(int argc, char *argv[]){
 
 	Scene scene(curr_dir, vec3(0, 1, 3), SCR_WIDTH, SCR_HEIGHT);
 	camera = scene.getCamera();
-	
-	GLFWwindow *window = initWindow(SCR_WIDTH, SCR_HEIGHT, window_name);
-	if(window == NULL)
-		return -1;
-
-
 	if(MOUSE_VERTICAL_INVERSE)
 		camera->setMouseVerticalInverse(true);
 	if(MOUSE_HORIZONTAL_INVERSE)
 		camera->setMouseHorizontalInverse(true);
 
-
-
+	//-------------------------configure model-------------------------------//
 	//ground model
 	Material ground_mat(vec3(0), vec3(0), vec3(0), 8.0f);
 	vector<string> ground_tex = {tex_floor, tex_floor, tex_floor};
@@ -57,13 +55,10 @@ int main(int argc, char *argv[]){
 	SceneID cube_2 = scene.addCube(cube_mat, cube_tex);
 	scene.setModelPos(cube_2, translate(mat4(1.0f), vec3(-1.5, 0.5001, -3.0)));
 
-
 	//--------------------------configure light------------------------------//
-	//direction/position, ambient, diffuse, specular, direction
 	//white
 	SceneID dir_white = scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3),
-		vec3(0.2), vec3(0.5), vec3(0.8));
-
+		vec3(0.2), vec3(0.5), vec3(0.5));
 
 	//-----------------------resndering loop---------------------------------//
 	while (!glfwWindowShouldClose(window)){

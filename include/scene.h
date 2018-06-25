@@ -98,6 +98,15 @@ public:
 
 	SceneID addCube(Material&, std::vector<std::string>&);
 
+	//high light a model by outlining it, model is by default not high lighted
+	//PRE:
+	//	SceneID: id of the outlined model
+	//	vec: color of outlining
+	//	bool: whether outlining the model
+	//if the SceneID is invalid, nothing will be done
+	void setOutline(SceneID, glm::vec3&, bool);
+
+
 	//add a spot light into the scene
 	//PRE: 
 	//	direction: direction of the spot light pointing to
@@ -183,9 +192,9 @@ public:
 private:
 	//fragment and vertex shaders' path
 	std::string curr_dir;
-	std::string vertex_normal = curr_dir + "/../resources/shader/General.vs";
-	std::string fragment_normal = curr_dir + "/../resources/shader/General.fs";
-	std::string fragment_depth = curr_dir + "/../resources/shader/Depth.fs";
+	std::string vertex_normal;
+	std::string fragment_normal;
+	std::string fragment_depth;
 
 	unsigned int scrWidth;
 	unsigned int scrHeight;
@@ -199,7 +208,7 @@ private:
 
 	//set model's view and projection matrices
 	//model's position should be set in the setModelPos function
-	void setShader(Model &obj, glm::mat4 view, glm::mat4 proj);
+	void setShader(Model &obj, glm::mat4 &pos, glm::mat4 &view, glm::mat4 &proj);
 
 	//send all lights in the scene to models' shaders
 	void sendLights(Model &model);

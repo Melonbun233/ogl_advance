@@ -25,6 +25,7 @@ public:
 	Model(const std::string &path, Shader &shader) : shader(shader)
 	{
 		loadAiModel(path);
+		pos = glm::mat4(1.0f);// origin 
 	}
 
 	//manually provide vertices' positions, normals, texture coordinates maeterial and texture file path
@@ -44,16 +45,26 @@ public:
 		std::vector<std::string> &tex_path) : shader(shader)
 	{
 		loadManualModel(positions, normals, indices, coords, mat, tex_path);
+		pos = glm::mat4(1.0f); //origin
 	}
 
 
-	//call this function to render the model with provided shader
+	//call this function to render the model with default shader
 	void render();
+	//render the model with a provided shader
+	void render(Shader&);
+	//set whether outlining the model
+	void setOutline(bool);
+	//set outlining color
+	void setOutlineColor(glm::vec3&);
 
 	//directory of this model. All other textures should be in the same directory
 	std::string directory;
 	//shader used for this model
 	Shader shader;
+	//position matrix of this model
+	//this matrix could be used as scaling, translating, and rotating
+	glm::mat4 pos;
 	std::vector<Mesh> meshes;
 
 private:
