@@ -20,30 +20,67 @@ void Scene::setModelPos(SceneID id, mat4 pos)
 	cout << "Invalid ID: not MODEL";
 }
 
-void Scene::setShader(Model &obj, mat4 &pos, mat4 &view, mat4 &proj)
+void Scene::setShader(Shader &shader, mat4 model, mat4 view, mat4 proj)
 {
-	obj.shader.use();
-	obj.shader.setMat4("model", pos);
-	obj.shader.setMat4("view", view);
-	obj.shader.setMat4("proj", proj);
-	obj.shader.setVec3("viewPos", camera.Position);
+	shader.use();
+	shader.setMat4("model", model);
+	shader.setMat4("view", view);
+	shader.setMat4("proj", proj);
+	shader.setVec3("viewPos", camera.Position);
 }
 
 void Scene::render()
 {
+	//do nothing if stencil or depth test fails
+	//only update stancil's value when both tests pass
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilMask(0x00);
 	//render all normal objects
 	for (auto it = models.begin(); it != models.end(); it++)
 	{
-		sendLights(it->second);
-		//updating view and projection matrices
-		mat4 pos, view, proj;
-		pos = it->second.pos;
-		view = camera.getView();
-		proj = getProjMat();
-		setShader(it->second, pos, view, proj);
-		it->second.render();
+		Model model = it->second;
+		if (!model.outlined){
+			sendLights(model);
+			//updating view and projection matrices
+			setShader(model.shader, model.pos, camera.getView(), getProjMat());
+			model.render();
+		}
 	}
+
+	//render all outlined objects with their own shaders
+	//update all stancil values with 1
+	glStencilFunc(GL_ALWAYS, 1, 0xff);
+	glStencilMask(0xff);
+	for (auto it = models.begin(); it != models.end(); it++)
+	{
+		Model model = it->second;
+		if(model.outlined)
+		{
+			sendLights(model);
+			setShader(model.shader, model.pos, camera.getView(), getProjMat());
+			model.render();
+		}
+	}
+
+	//render all lines for high lighted objects
+	glStencilFunc(GL_NOTEQUAL, 1, 0xff);
+	glStencilMask(0x00);
+	glDisable(GL_DEPTH_TEST);
+	for (auto it = models.begin(); it != models.end(); it ++)
+	{
+		Model model = it->second;
+		if(model.outlined)
+		{
+			setShader(single_color_shader, scale(model.pos, vec3(1.1, 1.1, 1.1)), 
+				camera.getView(), getProjMat());
+			single_color_shader.setVec3("outline_color", model.outline_color);
+			model.render(single_color_shader);
+		}
+	}
+	glStencilMask(0xff);
+	glEnable(GL_DEPTH_TEST);
 }
+
 
 void Scene::sendLights(Model &model)
 {
@@ -83,7 +120,6 @@ SceneID Scene::addModel(const string path)
 SceneID Scene::addPlane(Material &mat, vector<string> &tex_path)
 {
 	Shader shader(vertex_normal, fragment_normal);
-	cout << vertex_normal << ", " << fragment_normal << endl;
 	Model model = loadModel(shader, square_vertices, square_indices, square_vertices_num, 
 		square_indices_num, mat, tex_path);
 	//assign id
@@ -133,8 +169,8 @@ void Scene::setOutline(SceneID ID, vec3 &color, bool outlined)
 		auto search = models.find(ID.id);
 		if(search != models.end())
 		{
-			search->second.setOutline(outlined);
-			search->second.setOutlineColor(color);
+			search->second.outlined = outlined;
+			search->second.outline_color = color;
 			return;
 		}
 		cout << "Model ID not found" << endl;

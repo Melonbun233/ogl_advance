@@ -15,6 +15,10 @@ public:
 	//constructor that builds and reads the shader
 	Shader(const std::string &vertexPath, const std::string &fragmentPath);
 
+	Shader() = default;
+
+	void setup(const std::string&, const std::string&);
+
 	//shader program ID
 	int ID;
 
@@ -48,6 +52,7 @@ public:
 
 
 private:
+	std::string vertex, fragment;
 	// check whether shader is compiled succesfully
 	void checkShaderSuccess(unsigned int shader, const std::string &type);
 	// check whether shader program is succesfully linked

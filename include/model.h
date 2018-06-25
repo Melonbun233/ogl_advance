@@ -53,10 +53,6 @@ public:
 	void render();
 	//render the model with a provided shader
 	void render(Shader&);
-	//set whether outlining the model
-	void setOutline(bool);
-	//set outlining color
-	void setOutlineColor(glm::vec3&);
 
 	//directory of this model. All other textures should be in the same directory
 	std::string directory;
@@ -66,14 +62,15 @@ public:
 	//this matrix could be used as scaling, translating, and rotating
 	glm::mat4 pos;
 	std::vector<Mesh> meshes;
+	bool outlined = false;
+	//model outlining color
+	glm::vec3 outline_color;
 
 private:
 	//store loaded textures to optimize
 	std::vector<Texture> textures_loaded; 
 	//whether the model is outlined
-	bool outlined = false;
-	//model outlining color
-	glm::vec3 outline_color;
+
 
 	//load the model using assimp
 	void loadAiModel(const std::string path);

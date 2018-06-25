@@ -18,16 +18,6 @@ void Model::render(Shader &_shader)
 		meshes[i].render(_shader);
 }
 
-void Model::setOutline(bool _outlined)
-{
-	outlined = _outlined;
-}
-
-void Model::setOutlineColor(vec3 &color)
-{
-	outline_color = color;
-}
-
 void Model::loadAiModel(const string path)
 {
 	Importer importer;

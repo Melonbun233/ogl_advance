@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -52,6 +54,9 @@ public:
 		vertex_normal = curr_dir + "/../resources/shader/General.vs";
 		fragment_normal = curr_dir + "/../resources/shader/General.fs";
 		fragment_depth = curr_dir + "/../resources/shader/Depth.fs";
+		fragment_single_color = curr_dir + "/../resources/shader/SingleColor.fs";
+
+		single_color_shader = Shader(vertex_normal, fragment_single_color);
 
 		camera = Camera(cam_pos); 
 		perspec = 1;
@@ -190,11 +195,14 @@ public:
 
 
 private:
+
+	Shader single_color_shader;
 	//fragment and vertex shaders' path
 	std::string curr_dir;
 	std::string vertex_normal;
 	std::string fragment_normal;
 	std::string fragment_depth;
+	std::string fragment_single_color;
 
 	unsigned int scrWidth;
 	unsigned int scrHeight;
@@ -208,7 +216,7 @@ private:
 
 	//set model's view and projection matrices
 	//model's position should be set in the setModelPos function
-	void setShader(Model &obj, glm::mat4 &pos, glm::mat4 &view, glm::mat4 &proj);
+	void setShader(Shader&, glm::mat4, glm::mat4, glm::mat4);
 
 	//send all lights in the scene to models' shaders
 	void sendLights(Model &model);

@@ -55,6 +55,9 @@ int main(int argc, char *argv[]){
 	SceneID cube_2 = scene.addCube(cube_mat, cube_tex);
 	scene.setModelPos(cube_2, translate(mat4(1.0f), vec3(-1.5, 0.5001, -3.0)));
 
+	vec3 outline_color(0.04, 0.28, 0.26);
+	scene.setOutline(cube_1, outline_color, true);
+	scene.setOutline(cube_2, outline_color, true);
 	//--------------------------configure light------------------------------//
 	//white
 	SceneID dir_white = scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3),
