@@ -33,7 +33,7 @@ void Scene::render()
 {
 	//do nothing if stencil or depth test fails
 	//only update stancil's value when both tests pass
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 	glStencilMask(0x00);
 	//render all normal objects
 	for (auto it = models.begin(); it != models.end(); it++)

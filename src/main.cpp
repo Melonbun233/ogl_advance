@@ -32,6 +32,7 @@ int main(int argc, char *argv[]){
 	const string nano_path = curr_dir + "/../resources/objects/nanosuit/nanosuit.obj";
 	const string tex_floor = curr_dir + "/../resources/textures/floor.jpg";
 	const string tex_stone = curr_dir + "/../resources/textures/stone.jpg";
+	const string tex_grass = curr_dir + "/../resources/textures/grass.png";
 
 	Scene scene(curr_dir, vec3(0, 1, 3), SCR_WIDTH, SCR_HEIGHT);
 	camera = scene.getCamera();
@@ -41,6 +42,18 @@ int main(int argc, char *argv[]){
 		camera->setMouseHorizontalInverse(true);
 
 	//-------------------------configure model-------------------------------//
+	//grass material
+	Material mat_grass(vec3(0), vec3(0), vec3(0), 8.0f);
+	vector<string> grass_tex = {tex_grass, tex_grass, tex_grass};
+	SceneID grasses[5];
+	for (int i = 0; i < 5; i ++)
+	{
+		grasses[i] = scene.addPlane(mat_grass, grass_tex);
+		mat4 grass_pos = mat4(1.0);
+		grass_pos = translate(grass_pos, vec3(-3.0f + i, 0.5f, 1.0f));
+		grass_pos = rotate(grass_pos, radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
+		scene.setModelPos(grasses[i], grass_pos);
+	}
 	//ground model
 	Material ground_mat(vec3(0), vec3(0), vec3(0), 8.0f);
 	vector<string> ground_tex = {tex_floor, tex_floor, tex_floor};

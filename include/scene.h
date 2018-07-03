@@ -25,14 +25,17 @@ enum OBJECT_TYPE {
 	MODEL,
 	SPOT_LIGHT,
 	DIR_LIGHT,
-	POINT_LIGHT
+	POINT_LIGHT,
+	INVALID
 };
 
 struct SceneID {
-	const unsigned int id;
+	unsigned int id;
 	OBJECT_TYPE type;
 
 	SceneID(unsigned int id, OBJECT_TYPE type) : id(id), type(type){}
+
+	SceneID(){id = 0; type = INVALID;}
 };
 
 

@@ -62,37 +62,38 @@ uniform Material material;
 uniform vec3 viewPos;
 
 //functions to calculate ambient, diffuse and specular
-vec3 calcAmbient(vec3 light_amb);
-vec3 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir);
-vec3 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir);
+vec4 calcAmbient(vec3 light_amb);
+vec4 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir);
+vec4 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir);
 
 //functions to calculate different light type
-vec3 processDirLights(vec3 normal, vec3 viewDir);
-vec3 processPointLights(vec3 normal, vec3 viewDir);
-vec3 processSpotLights(vec3 normal, vec3 viewDir);
+vec4 processDirLights(vec3 normal, vec3 viewDir);
+vec4 processPointLights(vec3 normal, vec3 viewDir);
+vec4 processSpotLights(vec3 normal, vec3 viewDir);
 
 void main()
 {
 	//light properties
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 result;
+	vec4 result;
 
 	result += processDirLights(norm, viewDir);
 	result += processPointLights(norm, viewDir);
 	result += processSpotLights(norm, viewDir);
-	if(result == vec3(0))	//no light in this shader, add ambient light manually
+	if(result == vec4(0))	//no light in this shader, add ambient light manually
 	{
 		result += calcAmbient(vec3(0.2));
 	}
 
-	FragColor = vec4(result, 1.0);
+	FragColor = result;
 
 }
 
-vec3 processDirLights(vec3 normal, vec3 viewDir)
+vec4 processDirLights(vec3 normal, vec3 viewDir)
 {
-	vec3 lightDir, ambient, diffuse, specular;
+	vec3 lightDir;
+	vec4 ambient, diffuse, specular;
 	for (int i = 0; i < DIR_LIGHTS_NUM; i ++)
 	{	
 		lightDir = normalize(-dirLights[i].direction);
@@ -103,9 +104,10 @@ vec3 processDirLights(vec3 normal, vec3 viewDir)
 	return (ambient + diffuse + specular);
 }
 
-vec3 processPointLights(vec3 normal, vec3 viewDir)
+vec4 processPointLights(vec3 normal, vec3 viewDir)
 {
-	vec3 lightDir, ambient, diffuse, specular;
+	vec3 lightDir;
+	vec4 ambient, diffuse, specular;
 	for (int i = 0; i < POINT_LIGHTS_NUM; i ++)
 	{
 		lightDir = normalize(pointLights[i].position - FragPos);
@@ -122,9 +124,10 @@ vec3 processPointLights(vec3 normal, vec3 viewDir)
 	return (ambient + diffuse + specular);
 }
 
-vec3 processSpotLights(vec3 normal, vec3 viewDir)
+vec4 processSpotLights(vec3 normal, vec3 viewDir)
 {
-	vec3 lightDir, ambient, diffuse, specular;
+	vec3 lightDir;
+	vec4 ambient, diffuse, specular;
 	for (int i = 0; i < SPOT_LIGHTS_NUM; i ++)
 	{
 		lightDir = normalize(spotLights[i].position - FragPos);
@@ -142,50 +145,63 @@ vec3 processSpotLights(vec3 normal, vec3 viewDir)
 	return (ambient + diffuse + specular);
 }
 
-vec3 calcAmbient(vec3 light_amb)
+vec4 calcAmbient(vec3 light_amb)
 {
-	vec3 tex; 
+	vec4 tex; 
 	if (material.amb_num == 0)	//no ambient map, use material's own ambient color
-		tex = material.ambient;
+		tex = vec4(material.ambient, 1.0);
 	else
 	{
 		for (int i = 0; i < material.amb_num; i ++)
-			tex += vec3(texture(material.tex_ambient[i], TexCoords));
+			tex += texture(material.tex_ambient[i], TexCoords);
 	}
 	
-	return light_amb * tex;
+	//discard fragment with too low alpha value
+	if (tex.w < 0.1)
+		discard;
+
+	return vec4(light_amb * vec3(tex), tex.w);
 }
 
-vec3 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir)
+vec4 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir)
 {
-	vec3 tex;
+	vec4 tex;
 	float diff = max(dot(normal, lightDir), 0.0);
 
 	if (material.diff_num == 0) //no diffuse map, use material's own diffuse color
-		tex = material.diffuse;
+		tex = vec4(material.diffuse, 1.0);
 	else 
 	{
 		for (int i = 0; i < material.diff_num; i ++)
-			tex += vec3(texture(material.tex_diffuse[i], TexCoords));
+			tex += texture(material.tex_diffuse[i], TexCoords);
 	}
-	return light_diff * diff * tex;
+
+	//discard fragment with too low alpha value
+	if (tex.w < 0.1)
+		discard;
+
+	return vec4(light_diff * diff * vec3(tex), tex.w);
 }
 
-vec3 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir)
+vec4 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir)
 {
-	vec3 tex;
+	vec4 tex;
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
 	if (material.spec_num == 0) //no specular map, use material's own specular color
-		tex = material.specular;
+		tex = vec4(material.specular, 1.0);
 	else 
 	{
 		for (int i = 0; i < material.spec_num; i ++)
-			tex += vec3(texture(material.tex_specular[i], TexCoords));
+			tex += texture(material.tex_specular[i], TexCoords);
 	}
 
-	return light_spec * spec * tex;
+	//discard fragment with too low alpha value
+	if (tex.w < 0.1)
+		discard;
+	
+	return vec4(light_spec * spec * vec3(tex), tex.w);
 }
 
 

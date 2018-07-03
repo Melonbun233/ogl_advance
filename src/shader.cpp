@@ -84,7 +84,6 @@ void Shader::checkShaderSuccess(unsigned int shader, const std::string &type){
 		std::cout << type << " shader compilation error\n" << infoLog << std::endl;
 		return;
 	}
-	std::cout << "Shader compilation successful" << std::endl;
 }
 // check whether shader program is succesfully linked
 void Shader::checkLinkSuccess(unsigned int ID){
@@ -97,6 +96,4 @@ void Shader::checkLinkSuccess(unsigned int ID){
 		std::cout << "Shader Program Linking Error\n" << infoLog << std::endl;
 		return;
 	}
-
-	std::cout << "Shader program linking successful" << std::endl;
 }
