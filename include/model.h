@@ -13,6 +13,7 @@
 #include <assimp/postprocess.h>
 #include "stb_image.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "mesh.h"
 #include "shader.h"
 
@@ -25,7 +26,11 @@ public:
 	Model(const std::string &path, Shader &shader) : shader(shader)
 	{
 		loadAiModel(path);
-		pos = glm::mat4(1.0f);// origin 
+		model = glm::mat4(1.0);
+		pos = glm::vec3(0.0);
+		rotate_angle = 0;
+		rotate = glm::vec3(1.0);
+		scale = glm::vec3(1.0);
 	}
 
 	//manually provide vertices' positions, normals, texture coordinates maeterial and texture file path
@@ -45,7 +50,11 @@ public:
 		std::vector<std::string> &tex_path) : shader(shader)
 	{
 		loadManualModel(positions, normals, indices, coords, mat, tex_path);
-		pos = glm::mat4(1.0f); //origin
+		model = glm::mat4(1.0);
+		pos = glm::vec3(0.0);
+		rotate_angle = 0;
+		rotate = glm::vec3(1.0);
+		scale = glm::vec3(1.0);
 	}
 
 
@@ -58,10 +67,19 @@ public:
 	std::string directory;
 	//shader used for this model
 	Shader shader;
-	//position matrix of this model
-	//this matrix could be used as scaling, translating, and rotating
-	glm::mat4 pos;
+	
+	//calculate model view according to translation, rotation, and scaling
+	void calcModelView();
+	//initialize the position, rotation, and scaling vector
+	glm::mat4 model;
+	glm::vec3 pos, rotate, scale;
+	float rotate_angle;
+
 	std::vector<Mesh> meshes;
+
+	//whether transparent
+	bool transparent;
+	//outlining functionality
 	bool outlined = false;
 	//model outlining color
 	glm::vec3 outline_color;
@@ -89,6 +107,8 @@ private:
 	//both functions used to load textures
 	unsigned int loadTexture(const std::string &path, const std::string &directory);
 	unsigned int loadTexture(const std::string);
+
+
 };
 
 #endif

@@ -3,22 +3,7 @@
 using namespace glm;
 using namespace std;
 
-void Scene::setModelPos(SceneID id, mat4 pos)
-{
-	if(id.type == MODEL)
-	{
-		//searching model
-		auto search = models.find(id.id);
-		if(search != models.end())
-		{
-			search->second.pos = pos;
-			return;
-		}
-		cout << "Model ID not found" << endl;
-		return;
-	}
-	cout << "Invalid ID: not MODEL";
-}
+
 
 void Scene::setShader(Shader &shader, mat4 model, mat4 view, mat4 proj)
 {
@@ -31,54 +16,73 @@ void Scene::setShader(Shader &shader, mat4 model, mat4 view, mat4 proj)
 
 void Scene::render()
 {
-	//do nothing if stencil or depth test fails
-	//only update stancil's value when both tests pass
-	glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-	glStencilMask(0x00);
+	// //do nothing if stencil or depth test fails
+	// //only update stancil's value when both tests pass
+	// glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+	// glStencilMask(0x00);
+
 	//render all normal objects
-	for (auto it = models.begin(); it != models.end(); it++)
-	{
-		Model model = it->second;
-		if (!model.outlined){
-			sendLights(model);
-			//updating view and projection matrices
-			setShader(model.shader, model.pos, camera.getView(), getProjMat());
-			model.render();
-		}
-	}
 
-	//render all outlined objects with their own shaders
-	//update all stancil values with 1
-	glStencilFunc(GL_ALWAYS, 1, 0xff);
-	glStencilMask(0xff);
-	for (auto it = models.begin(); it != models.end(); it++)
-	{
-		Model model = it->second;
-		if(model.outlined)
-		{
-			sendLights(model);
-			setShader(model.shader, model.pos, camera.getView(), getProjMat());
-			model.render();
-		}
-	}
-
-	//render all lines for high lighted objects
-	glStencilFunc(GL_NOTEQUAL, 1, 0xff);
-	glStencilMask(0x00);
-	glDisable(GL_DEPTH_TEST);
+	//sort all models from farthest to closest to the camera
+	map<float, Model*> sorted;
 	for (auto it = models.begin(); it != models.end(); it ++)
 	{
-		Model model = it->second;
-		if(model.outlined)
+		if(it->second.transparent)	//have alpha value
 		{
-			setShader(single_color_shader, scale(model.pos, vec3(1.1, 1.1, 1.1)), 
-				camera.getView(), getProjMat());
-			single_color_shader.setVec3("outline_color", model.outline_color);
-			model.render(single_color_shader);
+			float distance = length(camera.Position - it->second.pos);
+			sorted[distance] = &it->second;
+		} 
+		else //doesn't have alpha value
+		{
+			Model model = it->second;
+			sendLights(model);
+			setShader(model.shader, model.model, camera.getView(), getProjMat());
+			model.render();
 		}
+		
 	}
-	glStencilMask(0xff);
-	glEnable(GL_DEPTH_TEST);
+
+	for (auto it = sorted.rbegin(); it != sorted.rend(); it++)
+	{
+		Model *model = it->second;
+		sendLights(*model);
+		//updating view and projection matrices
+		setShader(model->shader, model->model, camera.getView(), getProjMat());
+		model->render();
+	}
+
+	// //render all outlined objects with their own shaders
+	// //update all stancil values with 1
+	// glStencilFunc(GL_ALWAYS, 1, 0xff);
+	// glStencilMask(0xff);
+	// for (auto it = models.begin(); it != models.end(); it++)
+	// {
+	// 	Model model = it->second;
+	// 	if(model.outlined)
+	// 	{
+	// 		sendLights(model);
+	// 		setShader(model.shader, model.pos, camera.getView(), getProjMat());
+	// 		model.render();
+	// 	}
+	// }
+
+	// //render all lines for high lighted objects
+	// glStencilFunc(GL_NOTEQUAL, 1, 0xff);
+	// glStencilMask(0x00);
+	// glDisable(GL_DEPTH_TEST);
+	// for (auto it = models.begin(); it != models.end(); it ++)
+	// {
+	// 	Model model = it->second;
+	// 	if(model.outlined)
+	// 	{
+	// 		setShader(single_color_shader, scale(model.pos, vec3(1.1, 1.1, 1.1)), 
+	// 			camera.getView(), getProjMat());
+	// 		single_color_shader.setVec3("outline_color", model.outline_color);
+	// 		model.render(single_color_shader);
+	// 	}
+	// }
+	// glStencilMask(0xff);
+	// glEnable(GL_DEPTH_TEST);
 }
 
 
@@ -162,22 +166,23 @@ Model Scene::loadModel(Shader &shader, const float vertices[], const unsigned in
 	return Model(shader, positions, normals, index, coords, mat, tex_path);
 }
 
-void Scene::setOutline(SceneID ID, vec3 &color, bool outlined)
-{
-	if(ID.type == MODEL)
-	{
-		auto search = models.find(ID.id);
-		if(search != models.end())
-		{
-			search->second.outlined = outlined;
-			search->second.outline_color = color;
-			return;
-		}
-		cout << "Model ID not found" << endl;
-		return;
-	}
-	cout << "Invalid ID: not a Model" << endl;
-}
+//this function is currently removed
+// void Scene::setOutline(SceneID ID, vec3 &color, bool outlined)
+// {
+// 	if(ID.type == MODEL)
+// 	{
+// 		auto search = models.find(ID.id);
+// 		if(search != models.end())
+// 		{
+// 			search->second.outlined = outlined;
+// 			search->second.outline_color = color;
+// 			return;
+// 		}
+// 		cout << "Model ID not found" << endl;
+// 		return;
+// 	}
+// 	cout << "Invalid ID: not a Model" << endl;
+// }
 
 SceneID Scene::addSpotLight(vec3 direction, vec3 position, float inner, float outer)
 {
@@ -385,4 +390,59 @@ mat4 Scene::getProjMat()
 		proj = ortho(0.0f, float(scrWidth), 0.0f, float(scrHeight), 0.1f, 100.0f);
 
 	return proj;
+}
+
+void Scene::setModelPos(SceneID id, vec3 pos)
+{
+	if(id.type == MODEL)
+	{
+		//searching model
+		auto search = models.find(id.id);
+		if(search != models.end())
+		{
+			search->second.pos = pos;
+			search->second.calcModelView();
+			return;
+		}
+		cout << "Model ID not found" << endl;
+		return;
+	}
+	cout << "Invalid ID: not MODEL";
+}
+
+void Scene::setModelRotate(SceneID id, float angle, vec3 rotate)
+{
+	if(id.type == MODEL)
+	{
+		//searching model
+		auto search = models.find(id.id);
+		if(search != models.end())
+		{
+			search->second.rotate = rotate;
+			search->second.rotate_angle = angle;
+			search->second.calcModelView();
+			return;
+		}
+		cout << "Model ID not found" << endl;
+		return;
+	}
+	cout << "Invalid ID: not MODEL";
+}
+
+void Scene::setModelScale(SceneID id, vec3 scale)
+{
+	if(id.type == MODEL)
+	{
+		//searching model
+		auto search = models.find(id.id);
+		if(search != models.end())
+		{
+			search->second.scale = scale;
+			search->second.calcModelView();
+			return;
+		}
+		cout << "Model ID not found" << endl;
+		return;
+	}
+	cout << "Invalid ID: not MODEL";
 }

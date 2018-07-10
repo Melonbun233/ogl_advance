@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
@@ -67,13 +68,31 @@ public:
 		scrHeight = height;
 	}
 
-	//set object's model view.
-	//you can call setPerspec to set the projection of the scene
+	//manually set a object as transparent or not
+	//normally you dont need to call this function since transparency is set when loading texture
+	void setTransparent(SceneID model_id, bool trans);
+	
+	//set object's position.
 	//PRE: 
 	//	model_id: scene id of the model need to be positioned. this should be valid, otherwise
 	//		nothing will be done
-	//	model: model matrix used to set the position and scale of the object
-	void setModelPos(SceneID model_id, glm::mat4 model);
+	//	pos: position of the model
+	void setModelPos(SceneID model_id, glm::vec3 pos);
+
+	//set object's rotation
+	//PRE:
+	//	model_id: scene id of the model need to be rotated. This should be valid, otherwise 
+	//		nothing will be affected
+	//	angle: rotating angle
+	//	rotate: rotating vector
+	void setModelRotate(SceneID model_id, float angle, glm::vec3 rotate);
+
+	//set object's scaling
+	//PRE:
+	//	model_id: scene id of the model need to be scaled. This should be valid, otherwise 
+	//		nothing will be affected
+	//	scale: scaling vector
+	void setModelScale(SceneID model_id, glm::vec3 scale);
 
 	//set the projection as perspective or ortho
 	//those two functions are not available currently
@@ -106,13 +125,14 @@ public:
 
 	SceneID addCube(Material&, std::vector<std::string>&);
 
-	//high light a model by outlining it, model is by default not high lighted
-	//PRE:
-	//	SceneID: id of the outlined model
-	//	vec: color of outlining
-	//	bool: whether outlining the model
-	//if the SceneID is invalid, nothing will be done
-	void setOutline(SceneID, glm::vec3&, bool);
+	//this function is currently removed 
+	// //high light a model by outlining it, model is by default not high lighted
+	// //PRE:
+	// //	SceneID: id of the outlined model
+	// //	vec: color of outlining
+	// //	bool: whether outlining the model
+	// //if the SceneID is invalid, nothing will be done
+	// void setOutline(SceneID, glm::vec3&, bool);
 
 
 	//add a spot light into the scene

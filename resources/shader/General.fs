@@ -157,8 +157,8 @@ vec4 calcAmbient(vec3 light_amb)
 	}
 	
 	//discard fragment with too low alpha value
-	if (tex.w < 0.1)
-		discard;
+	// if (tex.w < 0.1)
+	// 	discard;
 
 	return vec4(light_amb * vec3(tex), tex.w);
 }
@@ -177,8 +177,8 @@ vec4 calcDiffuse(vec3 light_diff, vec3 normal, vec3 lightDir)
 	}
 
 	//discard fragment with too low alpha value
-	if (tex.w < 0.1)
-		discard;
+	// if (tex.w < 0.1)
+	// 	discard;
 
 	return vec4(light_diff * diff * vec3(tex), tex.w);
 }
@@ -198,8 +198,8 @@ vec4 calcSpecular(vec3 light_spec, vec3 normal, vec3 lightDir, vec3 viewDir)
 	}
 
 	//discard fragment with too low alpha value
-	if (tex.w < 0.1)
-		discard;
+	// if (tex.w < 0.1)
+	// 	discard;
 	
 	return vec4(light_spec * spec * vec3(tex), tex.w);
 }

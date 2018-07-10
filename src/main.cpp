@@ -33,6 +33,7 @@ int main(int argc, char *argv[]){
 	const string tex_floor = curr_dir + "/../resources/textures/floor.jpg";
 	const string tex_stone = curr_dir + "/../resources/textures/stone.jpg";
 	const string tex_grass = curr_dir + "/../resources/textures/grass.png";
+	const string tex_window = curr_dir + "/../resources/textures/transparent_window.png";
 
 	Scene scene(curr_dir, vec3(0, 1, 3), SCR_WIDTH, SCR_HEIGHT);
 	camera = scene.getCamera();
@@ -49,28 +50,32 @@ int main(int argc, char *argv[]){
 	for (int i = 0; i < 5; i ++)
 	{
 		grasses[i] = scene.addPlane(mat_grass, grass_tex);
-		mat4 grass_pos = mat4(1.0);
-		grass_pos = translate(grass_pos, vec3(-3.0f + i, 0.5f, 1.0f));
-		grass_pos = rotate(grass_pos, radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
-		scene.setModelPos(grasses[i], grass_pos);
+		scene.setModelPos(grasses[i], vec3(-3.0f + i, 0.5f, -2.0f + i));
+		scene.setModelRotate(grasses[i], 90.0f, vec3(1.0f, 0.0f, 0.0f));
 	}
 	//ground model
 	Material ground_mat(vec3(0), vec3(0), vec3(0), 8.0f);
 	vector<string> ground_tex = {tex_floor, tex_floor, tex_floor};
 	SceneID ground = scene.addPlane(ground_mat, ground_tex);
-	scene.setModelPos(ground, scale(mat4(1.0f), vec3(10.0f)));
+	scene.setModelScale(ground, vec3(10.0f));
  
+ 	//two cubes
 	Material cube_mat(vec3(0), vec3(0), vec3(0), 16.0f);
 	vector<string> cube_tex = {tex_stone, tex_stone, tex_stone};
 	SceneID cube_1 = scene.addCube(cube_mat, cube_tex);
-	scene.setModelPos(cube_1, translate(mat4(1.0f), vec3(0.0, 0.5001, 0.0)));
+	scene.setModelPos(cube_1, vec3(0.0, 0.5001, 0.0));
 
 	SceneID cube_2 = scene.addCube(cube_mat, cube_tex);
-	scene.setModelPos(cube_2, translate(mat4(1.0f), vec3(-1.5, 0.5001, -3.0)));
+	scene.setModelPos(cube_2, vec3(-1.5, 0.5001, -3.0));
 
-	vec3 outline_color(0.04, 0.28, 0.26);
-	scene.setOutline(cube_1, outline_color, true);
-	scene.setOutline(cube_2, outline_color, true);
+	//window
+	Material window_mat(vec3(0), vec3(0), vec3(0), 32.0f);
+	vector<string> window_tex = {tex_window, tex_window, tex_window};
+	SceneID win = scene.addPlane(window_mat, window_tex);
+	scene.setModelRotate(win, 90.0f, vec3(1.0f, 0.0, 0.0f));
+	scene.setModelPos(win, vec3(0.0f, 3.0f, 3.0f));
+	scene.setModelScale(win, vec3(3.0f));
+
 	//--------------------------configure light------------------------------//
 	//white
 	SceneID dir_white = scene.addDirLight(vec3(1.0, 1.0, 1.0), vec3(-0.2, -1.0, -0.3),
@@ -84,7 +89,7 @@ int main(int argc, char *argv[]){
 		delta_time = current_frame - last_frame;
 		last_frame = current_frame;
 		//clear last frame
-		glClearColor(0.0, 0.0, 0.0, 1.0f);
+		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		//draw objects
